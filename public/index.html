@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en"><head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -251,52 +252,29 @@
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
     </a>
   </div>
-
   <!-- Explore News by Categories -->
-  <section class="news-options">
-    <h2>Explore News by Category</h2>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-3 mb-4">
-          <div class="card news-card">
-            <img src="images/sports.jpg" alt="Sports News" class="card-img-top">
-            <div class="card-body">
-              <h5 class="news-card-title">Sports</h5>
-              <p class="news-card-text">Get the latest updates and scores from the world of sports.</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3 mb-4">
-          <div class="card news-card">
-            <img src="images/entertainment.jpg" alt="Entertainment News" class="card-img-top">
-            <div class="card-body">
-              <h5 class="news-card-title">Entertainment</h5>
-              <p class="news-card-text">Stay up to date with the latest in entertainment and celebrity news.</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3 mb-4">
-          <div class="card news-card">
-            <img src="images/stockmarket.jpg" alt="Stock Market News" class="card-img-top">
-            <div class="card-body">
-              <h5 class="news-card-title">Stock Market</h5>
-              <p class="news-card-text">The latest trends and stock updates to help you stay ahead.</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3 mb-4">
-          <div class="card news-card">
-            <img src="images/crypto.jpg" alt="Crypto News" class="card-img-top">
-            <div class="card-body">
-              <h5 class="news-card-title">Cryptocurrency</h5>
-              <p class="news-card-text">Get all the latest on Bitcoin, Ethereum, and other cryptocurrencies.</p>
-            </div>
-          </div>
-        </div>
+<section class="news-options">
+  <h2>Explore News by Category</h2>
+
+  <!-- Category Navigation Links -->
+  <nav class="category-links">
+    <a href="#" class="nav-link category-link" data-category="technology">Technology</a>
+    <a href="#" class="nav-link category-link" data-category="sports">Sports</a>
+    <a href="#" class="nav-link category-link" data-category="entertainment">Entertainment</a>
+    <a href="#" class="nav-link category-link" data-category="business">Business</a>
+    <a href="#" class="nav-link category-link" data-category="health">Health</a>
+    <a href="#" class="nav-link category-link" data-category="science">Science</a>
+  </nav>
+
+  <div class="container">
+    <div class="row">
+      <!-- Dynamically Loaded News Cards -->
+      <div id="news-container">
+        <!-- Dynamic news articles will be inserted here by JavaScript -->
       </div>
     </div>
-  </section>
-
+  </div>
+</section>  
   <!-- Subscription Section -->
   <section class="subscription-section">
     <h2>Subscribe to Our Daily News Feed</h2>
@@ -348,6 +326,7 @@
       console.error('Error fetching news:', error);
     });
 </script>
+<script src="js/script.js"></script>
 
 
 </body></html>
