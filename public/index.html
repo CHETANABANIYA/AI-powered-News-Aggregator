@@ -205,7 +205,7 @@
 </head>
 <body>
 
-  <!-- Navbar -->
+<!-- Navbar -->
   <nav class="navbar navbar-expand-lg">
     <div class="container">
       <a class="navbar-brand" href="#">NewsSphere</a>
@@ -214,9 +214,10 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Categories</a></li>
-          <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="Categories.html">Categories</a></li>
+          <li class="nav-item"><a class="nav-link" href="Contact.html">Contact</a></li>
+          <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
         </ul>
       </div>
     </div>
@@ -231,7 +232,7 @@
       <button type="button">Search</button>
     </div>
   </section>
-
+ 
   <!-- News Carousel -->
   <div id="newsCarousel" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-inner">
@@ -252,29 +253,52 @@
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
     </a>
   </div>
-  <!-- Explore News by Categories -->
-<section class="news-options">
-  <h2>Explore News by Category</h2>
-
-  <!-- Category Navigation Links -->
-  <nav class="category-links">
-    <a href="#" class="nav-link category-link" data-category="technology">Technology</a>
-    <a href="#" class="nav-link category-link" data-category="sports">Sports</a>
-    <a href="#" class="nav-link category-link" data-category="entertainment">Entertainment</a>
-    <a href="#" class="nav-link category-link" data-category="business">Business</a>
-    <a href="#" class="nav-link category-link" data-category="health">Health</a>
-    <a href="#" class="nav-link category-link" data-category="science">Science</a>
-  </nav>
-
-  <div class="container">
-    <div class="row">
-      <!-- Dynamically Loaded News Cards -->
-      <div id="news-container">
-        <!-- Dynamic news articles will be inserted here by JavaScript -->
+   
+<!-- Explore News by Categories -->
+  <section class="news-options">
+    <h2>Explore News by Category</h2>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3 mb-4">
+          <div class="card news-card">
+            <img src="images/sports.jpg" alt="Sports News" class="card-img-top">
+            <div class="card-body">
+              <h5 class="news-card-title">Sports</h5>
+              <p class="news-card-text">Get the latest updates and scores from the world of sports.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-4">
+          <div class="card news-card">
+            <img src="images/entertainment.jpg" alt="Entertainment News" class="card-img-top">
+            <div class="card-body">
+              <h5 class="news-card-title">Entertainment</h5>
+              <p class="news-card-text">Stay up to date with the latest in entertainment and celebrity news.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-4">
+          <div class="card news-card">
+            <img src="images/stockmarket.jpg" alt="Stock Market News" class="card-img-top">
+            <div class="card-body">
+              <h5 class="news-card-title">Stock Market</h5>
+              <p class="news-card-text">The latest trends and stock updates to help you stay ahead.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 mb-4">
+          <div class="card news-card">
+            <img src="images/crypto.jpg" alt="Crypto News" class="card-img-top">
+            <div class="card-body">
+              <h5 class="news-card-title">Cryptocurrency</h5>
+              <p class="news-card-text">Get all the latest on Bitcoin, Ethereum, and other cryptocurrencies.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</section>  
+  </section>
+  
   <!-- Subscription Section -->
   <section class="subscription-section">
     <h2>Subscribe to Our Daily News Feed</h2>
@@ -286,7 +310,8 @@
 
   <!-- Footer -->
   <footer class="footer">
-    <p>© 2025 NewsSphere | <a href="#">Privacy Policy</a></p>
+    <p>© 2025 NewsSphere | <li class="nav-item"><a class="nav-link" href="terms-of-service.html">Terms of Service</a></li>
+    <li class="nav-item"><a class="nav-link" href="privacy-policy.html">Privacy Policy</a></li>
   </footer>
 
   <!-- Bootstrap JS and dependencies -->
@@ -294,7 +319,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
   <script>
   // Fetch the news from the backend API
-  fetch('/api/news')
+  fetch('https://newsapi.org/v2/top-headlines?country=us&category=technology&apiKey=c8f7bbd1aa7b4719ae619139984f2b08')
     .then(response => response.json())
     .then(data => {
       const newsContainer = document.getElementById('news-container');
@@ -326,8 +351,10 @@
       console.error('Error fetching news:', error);
     });
 </script>
-<script src="js/script.js"></script>
+</body>
+</html>
 
 
-</body></html>
+
+
 

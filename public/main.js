@@ -1,6 +1,6 @@
 async function fetchNews() {
   try {
-    const response = await fetch('/api/news'); // Assuming your frontend and backend are served from the same origin
+    const response = await fetch('https://newsapi.org/v2/top-headlines?country=us&category=technology&apiKey=c8f7bbd1aa7b4719ae619139984f2b08'); // Assuming your frontend and backend are served from the same origin
     const newsData = await response.json();
     console.log(newsData);
 
