@@ -620,7 +620,7 @@ async function fetchNews(country, language) {
 const API_BASE_URL =
     window.location.hostname === "localhost"
         ? "http://localhost:5000/api"
-        : "https://yourbackenddomain.com/api"; // Replace with actual backend domain
+        : "https://ai-powered-news-aggregator-backend.onrender.com/api"; // ✅ Updated backend URL
 
 async function fetchNews(country, language) {
     if (isFetching) return;
@@ -681,7 +681,8 @@ async function fetchNews(country, language) {
     
     try {
       // Fetch the latest news
-      const response = await fetch('http://localhost:5000/api/news?category=general'); // You can use any category or remove the filter
+      const response = await fetch('https://ai-powered-news-aggregator-backend.onrender.com/api/news?category=general');
+
       const data = await response.json();
 
       // Clear the existing carousel items if any
@@ -802,7 +803,8 @@ document.getElementById("searchButton").addEventListener("click", async function
   console.log(`🔍 Searching for: ${query}`); // Debugging log
 
   try {
-    const response = await fetch(`http://localhost:5000/api/search?query=${encodeURIComponent(query)}`);
+    const response = await fetch(`https://ai-powered-news-aggregator-backend.onrender.com/api/search?query=${encodeURIComponent(query)}`);
+
     const data = await response.json();
 
     console.log(`✅ Found ${data.articles.length} results`); // Debugging log
