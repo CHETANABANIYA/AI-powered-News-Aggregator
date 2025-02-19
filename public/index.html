@@ -447,7 +447,7 @@
 
     const API_BASE_URL = window.location.hostname === "localhost"
       ? "http://localhost:5000/api"
-      : "https://yourbackenddomain.com/api"; // Update with actual backend URL
+        : "https://ai-powered-news-aggregator-backend.onrender.com/api"; // ✅ Updated backend URL
 
     async function fetchNewsByCategory() {
       newsContainer.innerHTML = '<p>Loading news...</p>';
@@ -565,20 +565,22 @@
     const email = document.getElementById("email-input").value;
     const message = document.getElementById("subscription-message");
 
-    if (!email) {
-      message.textContent = "Please enter a valid email!";
-      return;
-    }
+    if (!email.includes("@")) {
+  message.textContent = "Please enter a valid email address!";
+  return;
+  }
 
-    fetch("http://localhost:5000/api/subscribe", {
+   fetch("https://your-render-backend.onrender.com/api/subscribe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
     })
-    .then(response => response.json())
+    
     .then(data => {
-      message.textContent = data.message || "Subscription successful!";
-    })
+   message.textContent = data.message || "Subscription successful!";
+   document.getElementById("email-input").value = ""; // Clear input
+})
+
     .catch(error => {
       console.error("Error subscribing:", error);
       message.textContent = "Subscription failed. Try again!";
