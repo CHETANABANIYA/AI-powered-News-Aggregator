@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.css": "/CHETANABANIYA/ai-news-aggregator/static/css/main.129eaba5.css",
-    "main.js": "/CHETANABANIYA/ai-news-aggregator/static/js/main.91ad1dea.js",
-    "index.html": "/CHETANABANIYA/ai-news-aggregator/index.html",
-    "main.129eaba5.css.map": "/CHETANABANIYA/ai-news-aggregator/static/css/main.129eaba5.css.map",
-    "main.91ad1dea.js.map": "/CHETANABANIYA/ai-news-aggregator/static/js/main.91ad1dea.js.map"
+    "main.css": "/static/css/main.129eaba5.css",
+    "main.js": "/static/js/main.91ad1dea.js",
+    "index.html": "/index.html",
+    "main.129eaba5.css.map": "/static/css/main.129eaba5.css.map",
+    "main.91ad1dea.js.map": "/static/js/main.91ad1dea.js.map"
   },
   "entrypoints": [
     "static/css/main.129eaba5.css",
