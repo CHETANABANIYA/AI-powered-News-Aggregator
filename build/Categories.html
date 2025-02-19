@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Powered News Aggregator - Categories</title>
+  <!-- Google Fonts -->
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&amp;family=Roboto:wght@300;400;500&amp;display=swap" rel="stylesheet">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f4f7f6;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      background: #222;
+      padding: 15px 20px;
+    }
+
+    .navbar-brand {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 2rem;
+      color: #ff6f61;
+    }
+
+    .nav-link {
+      color: white;
+      margin: 0 10px;
+      font-weight: 500;
+    }
+
+    .nav-link:hover {
+      color: #ff6f61;
+    }
+
+    /* Categories Section */
+    .categories-section {
+      padding: 50px 20px;
+    }
+
+    .categories-section h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .category-card {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .category-card:hover {
+      transform: scale(1.05);
+    }
+
+    .category-card img {
+      border-top-left-radius: 15px;
+      border-top-right-radius: 15px;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .category-card .card-body {
+      padding: 15px;
+      background: #fff;
+      border-bottom-left-radius: 15px;
+      border-bottom-right-radius: 15px;
+    }
+
+    .category-card-title {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .category-card-text {
+      font-size: 0.95rem;
+      color: #666;
+    }
+
+    /* Footer */
+    .footer {
+      background: #222;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .footer a {
+      color: #ff6f61;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">🌍 NewsSphere</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="Categories.html">Categories</a></li>
+          <li class="nav-item"><a class="nav-link" href="Contact.html">Contact</a></li>
+          <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
+        </ul>
+       <!-- Country Selector -->
+      <li class="nav-item">
+        <select id="country-selector" class="form-select bg-dark text-light border-0">
+          <optgroup label="🌍 North America">
+        <option value="us">🇺🇸 US</option>
+        <option value="ca">🇨🇦 Canada</option>
+        <option value="mx">🇲🇽 Mexico</option>
+    </optgroup>
+    <optgroup label="🌍 Europe">
+        <option value="gb">🇬🇧 UK</option>
+        <option value="de">🇩🇪 Germany</option>
+        <option value="fr">🇫🇷 France</option>
+        <option value="it">🇮🇹 Italy</option>
+        <option value="es">🇪🇸 Spain</option>
+        <option value="se">🇸🇪 Sweden</option>
+        <option value="ch">🇨🇭 Switzerland</option>
+        <option value="nl">🇳🇱 Netherlands</option>
+    </optgroup>
+    <optgroup label="🌍 Asia">
+        <option value="in">🇮🇳 India</option>
+        <option value="jp">🇯🇵 Japan</option>
+        <option value="cn">🇨🇳 China</option>
+        <option value="kr">🇰🇷 South Korea</option>
+        <option value="id">🇮🇩 Indonesia</option>
+        <option value="sa">🇸🇦 Saudi Arabia</option>
+        <option value="sg">🇸🇬 Singapore</option> 
+    </optgroup>
+    <optgroup label="🌍 Other">
+        <option value="br">🇧🇷 Brazil</option>
+        <option value="ae">🇦🇪 UAE</option>
+        <option value="ru">🇷🇺 Russia</option>
+        <option value="za">🇿🇦 South Africa</option>
+        <option value="ar">🇦🇷 Argentina</option>
+        <option value="au">🇦🇺 Australia</option>
+    </optgroup>
+</select>
+      </li>
+
+      <!-- Language Selector -->
+      <li class="nav-item d-flex align-items-center">
+        <label for="language-selector" class="me-2 text-white fw-bold">🌐</label>
+        <select id="language-selector" class="form-select form-select-sm bg-dark text-light border-0">
+           <option value="en">🇬🇧 English</option>
+           <option value="fr">🇫🇷 French</option>
+           <option value="es">🇪🇸 Spanish</option>
+           <option value="hi">🇮🇳 Hindi</option>
+           <option value="ja">🇯🇵 Japanese</option>
+           <option value="de">🇩🇪 German</option>
+           <option value="ru">🇷🇺 Russian</option>
+           <option value="zh">🇨🇳 Chinese</option>
+</select>
+        </select>
+        </li>
+
+      <!-- Category Buttons -->
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="categoryDropdown" role="button" data-bs-toggle="dropdown">
+          🗂 Categories
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><button class="dropdown-item category-button" data-category="business">📈 Business</button></li>
+          <li><button class="dropdown-item category-button" data-category="technology">💻 Technology</button></li>
+          <li><button class="dropdown-item category-button" data-category="sports">⚽ Sports</button></li>
+          <li><button class="dropdown-item category-button" data-category="health">⚕️ Health</button></li>
+          <li><button class="dropdown-item category-button" data-category="entertainment">🎭 Entertainment</button></li>
+          <li><button class="dropdown-item category-button" data-category="science">🔬 Science</button></li>
+          <li><button class="dropdown-item category-button" data-category="general">🌎 General</button></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<!-- News Container -->
+<div id="news-container"></div>
+
+
+      </div>
+    </div>
+  </nav>
+  
+<!-- Categories Section -->
+  <section class="categories-section py-5">
+    <h2 class="text-center mb-4">Explore News by Category</h2>
+    <div class="container">
+      <div class="row">
+        <!-- Category Card for Sports -->
+        <div class="col-md-3 mb-4">
+          <div class="card category-card">
+            <img src="images/sports.jpg" class="card-img-top" alt="Sports">
+            <div class="card-body">
+              <h5 class="category-card-title">Sports</h5>
+              <p class="category-card-text">Stay updated with the latest sports news, scores, and highlights.</p>
+              <a href="news.html?category=sports" class="btn btn-primary">View News</a>
+            </div>
+          </div>
+        </div>
+        
+         <div class="col-md-3 mb-4">
+          <div class="card category-card">
+            <img src="images/stockmarket.jpg" alt="Stock Market News" class="card-img-top">
+            <div class="card-body">
+              <h5 class="category-card-title">Stock Market</h5>
+              <p class="category-card-text">The latest trends and stock updates to help you stay ahead.</p>
+              <a href="news.html?category=stockmarket" class="btn btn-primary">View News</a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+          <div class="card category-card">
+            <img src="images/crypto.jpg" alt="Crypto News" class="card-img-top">
+            <div class="card-body">
+              <h5 class="category-card-title">Cryptocurrency</h5>
+              <p class="category-card-text">Get all the latest on Bitcoin, Ethereum, and other cryptocurrencies.</p>
+              <a href="news.html?category=crypto" class="btn btn-primary">View News</a>
+            </div>
+            </div>
+            </div>
+
+        <!-- Category Card for Technology -->
+        <div class="col-md-3 mb-4">
+          <div class="card category-card">
+            <img src="images/tecnology.jpg" class="card-img-top" alt="Technology">
+            <div class="card-body">
+              <h5 class="category-card-title">Technology</h5>
+              <p class="category-card-text">Catch up on the latest tech innovations, gadgets, and industry updates.</p>
+              <a href="news.html?category=technology" class="btn btn-primary">View News</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Card for Business -->
+        <div class="col-md-3 mb-4">
+          <div class="card category-card">
+            <img src="images/Business.jpg" class="card-img-top" alt="Business">
+            <div class="card-body">
+              <h5 class="category-card-title">Business</h5>
+              <p class="category-card-text">Get the latest news on business trends, market analysis, and financial updates.</p>
+              <a href="news.html?category=business" class="btn btn-primary">View News</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Card for Entertainment -->
+        <div class="col-md-3 mb-4">
+          <div class="card category-card">
+            <img src="images/entertainment.jpg" class="card-img-top" alt="Entertainment">
+            <div class="card-body">
+              <h5 class="category-card-title">Entertainment</h5>
+              <p class="category-card-text">Discover the latest in movies, music, and celebrity news.</p>
+              <a href="news.html?category=entertainment" class="btn btn-primary">View News</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Card for Health -->
+        <div class="col-md-3 mb-4">
+          <div class="card category-card">
+            <img src="images/health.jpg" class="card-img-top" alt="Health">
+            <div class="card-body">
+              <h5 class="category-card-title">Health</h5>
+              <p class="category-card-text">Stay informed with the latest health news, wellness tips, and medical discoveries.</p>
+              <a href="news.html?category=health" class="btn btn-primary">View News</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Card for Science -->
+        <div class="col-md-3 mb-4">
+          <div class="card category-card">
+            <img src="images/Science.jpg" class="card-img-top" alt="Science">
+            <div class="card-body">
+              <h5 class="category-card-title">Science</h5>
+              <p class="category-card-text">Explore the world of science, from space exploration to the latest breakthroughs.</p>
+              <a href="news.html?category=science" class="btn btn-primary">View News</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Card for Politics -->
+        <div class="col-md-3 mb-4">
+          <div class="card category-card">
+            <img src="images/Polities.jpg" class="card-img-top" alt="Politics">
+            <div class="card-body">
+              <h5 class="category-card-title">Politics</h5>
+              <p class="category-card-text">Stay updated with the latest political news, elections, and government developments.</p>
+              <a href="news.html?category=politics" class="btn btn-primary">View News</a>
+            </div>
+          </div>
+        </div>
+        
+         <!-- Category Card for General -->
+        <div class="col-md-3 mb-4">
+          <div class="card category-card">
+            <img src="images/general.jpg" class="card-img-top" alt="General">
+            <div class="card-body">
+              <h5 class="category-card-title">General</h5>
+              <p class="category-card-text">Broad news topics that don't fit into other specific categories.</p>
+              <a href="news.html?category=general" class="btn btn-primary">View News</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Card for World -->
+        <div class="col-md-3 mb-4">
+          <div class="card category-card">
+            <img src="images/World.jpg" class="card-img-top" alt="World">
+            <div class="card-body">
+              <h5 class="category-card-title">World</h5>
+              <p class="category-card-text">Get the latest world news, global events, and international updates.</p>
+              <a href="news.html?category=world" class="btn btn-primary">View News</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Card for Education -->
+        <div class="col-md-3 mb-4">
+          <div class="card category-card">
+            <img src="images/Eduction.jpg" class="card-img-top" alt="Education">
+            <div class="card-body">
+              <h5 class="category-card-title">Education</h5>
+              <p class="category-card-text">Stay updated with the latest news in education, learning trends, and academic developments.</p>
+              <a href="news.html?category=education" class="btn btn-primary">View News</a>
+            </div>
+          </div>
+        </div>
+        </div>
+    </div>
+  </section>
+  
+<!-- Footer -->
+  <footer class="footer">
+    <p>© 2025 NewsSphere | <a href="privacy-policy.html">Privacy Policy</a></p>
+  </footer>
+
+  <!-- Bootstrap JS and dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
+ <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const countrySelector = document.getElementById("country-selector");
+    const languageSelector = document.getElementById("language-selector");
+    const categoryButtons = document.querySelectorAll(".category-button");
+
+    // Handle country selection
+    if (countrySelector) {
+        countrySelector.addEventListener("change", function () {
+            localStorage.setItem("selectedCountry", this.value);
+            location.reload();
+        });
+    }
+
+    // Handle language selection
+    if (languageSelector) {
+        languageSelector.addEventListener("change", function () {
+            localStorage.setItem("selectedLanguage", this.value);
+            location.reload();
+        });
+    }
+
+    // Handle category selection
+    if (categoryButtons.length > 0) {
+        categoryButtons.forEach(button => {
+            button.addEventListener("click", function () {
+                const category = this.dataset.category;
+                if (category) {
+                    window.location.href = `news.html?category=${category}`;
+                }
+            });
+        });
+    }
+});
+
+</script>
+
+

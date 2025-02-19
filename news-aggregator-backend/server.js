@@ -24,7 +24,7 @@ redisClient.connect().catch(console.error);
 
 // ✅ Enable CORS for frontend
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://ainewsify-news.netlify.app'],
+  origin: ['http://localhost:3000', 'https://ai-powered-news-aggregator.vercel.app'],
 }));
 
 // ✅ Rate Limiting (Prevents excessive requests)
