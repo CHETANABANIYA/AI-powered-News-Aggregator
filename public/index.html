@@ -432,24 +432,23 @@
 </section>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+ document.addEventListener('DOMContentLoaded', () => {
     const categories = ['sports', 'entertainment', 'technology', 'business', 'stockmarket', 'health'];
     const newsContainer = document.querySelector('#category-news-container');
     const carouselContainer = document.querySelector('#carousel-news-container');
     const countrySelector = document.querySelector('#country-selector');
     const languageSelector = document.querySelector('#language-selector');
-    const API_BASE_URL = "https://ai-powered-news-aggregator-backend.onrender.com";
 
+    // ✅ Fixed API_BASE_URL declaration
+    const API_BASE_URL = window.location.hostname === "localhost"
+        ? "http://localhost:5000/api"
+        : "https://ai-powered-news-aggregator-backend.onrender.com";
 
     let selectedCountry = localStorage.getItem("selectedCountry") || "us"; // Default country
     let selectedLanguage = localStorage.getItem("selectedLanguage") || "en"; // Default language
 
     countrySelector.value = selectedCountry;
     languageSelector.value = selectedLanguage;
-
-    const API_BASE_URL = window.location.hostname === "localhost"
-      ? "http://localhost:5000/api"
-        : "https://ai-powered-news-aggregator.vercel.app/api"; // ✅ Updated backend URL
 
     async function fetchNewsByCategory() {
       newsContainer.innerHTML = '<p>Loading news...</p>';
@@ -548,7 +547,8 @@
 
     // Fetch news on page load
     fetchAllNews();
-  });
+});
+
 </script>
 
 
