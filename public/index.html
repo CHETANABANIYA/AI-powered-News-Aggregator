@@ -449,7 +449,7 @@
 
     const API_BASE_URL = window.location.hostname === "localhost"
       ? "http://localhost:5000/api"
-        : "https://ai-powered-news-aggregator-backend.onrender.com/api"; // ✅ Updated backend URL
+        : "https://ai-powered-news-aggregator.vercel.app/api"; // ✅ Updated backend URL
 
     async function fetchNewsByCategory() {
       newsContainer.innerHTML = '<p>Loading news...</p>';
