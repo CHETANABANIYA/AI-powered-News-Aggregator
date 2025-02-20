@@ -603,248 +603,260 @@
 </html>
 
 <script>
-
-let isFetching = false; // Flag to prevent duplicate requests
-
-async function fetchNews(country, language) {
-    if (isFetching) return; // Prevent duplicate requests
-    isFetching = true;
-
-    try {
-        const response = await fetch(`https://your-render-backend.onrender.com/api/news?country=${country}&language=${language}`);
-
-        const data = await response.json();
-        displayNews(data);
-    } catch (error) {
-        console.error("Error fetching news:", error);
-    } finally {
-        isFetching = false; // Reset flag after fetch completes
-    }
-}
+let isFetching = false; // Prevent duplicate requests
 
 const API_BASE_URL =
-    window.location.hostname === "localhost"
-        ? "http://localhost:5000/api"
-        : "https://ai-powered-news-aggregator-backend.onrender.com/api"; // ✅ Updated backend URL
+  window.location.hostname === "localhost"
+    ? "http://localhost:5000/api"
+    : "https://ai-powered-news-aggregator-backend.onrender.com/api"; // ✅ Updated backend URL
 
 async function fetchNews(country, language) {
-    if (isFetching) return;
-    isFetching = true;
+  if (isFetching) return;
+  isFetching = true;
 
-    try {
-        const response = await fetch(`${API_BASE_URL}/news?country=${country}&language=${language}`);
-        const data = await response.json();
-        displayNews(data);
-    } catch (error) {
-        console.error("Error fetching news:", error);
-    } finally {
-        isFetching = false;
+  try {
+    const response = await fetch(`${API_BASE_URL}/news?country=${country}&language=${language}`);
+    const data = await response.json();
+
+    if (data.articles && data.articles.length > 0) {
+      displayNews(data.articles);
+    } else {
+      document.getElementById("news-container").innerHTML = `<p class="text-center text-warning">No news available.</p>`;
     }
-}
-
-
-
-      const response = await fetch(apiUrl);
-      const data = await response.json();
-
-      // ✅ Check for Articles
-      if (data.articles && data.articles.length > 0) {
-        const categoryHTML = `
-          <div class="card news-card">
-            <img src="${data.articles[0].image}" alt="${category}" class="card-img-top">
-            <div class="card-body">
-              <h5 class="news-card-title">${category.charAt(0).toUpperCase() + category.slice(1)}</h5>
-              <ul class="news-list">
-                ${data.articles.slice(0, 3).map(article => `
-                  <li>
-                    <h6>${article.title}</h6>
-                    <p>${article.description || 'No description available'}</p>
-                    <a href="${article.url}" target="_blank" class="btn btn-primary">Read More</a>
-                  </li>
-                `).join('')}
-              </ul>
-            </div>
-          </div>
-        `;
-        categoryRow.innerHTML = categoryHTML;
-        newsContainer.appendChild(categoryRow);
-      } else {
-        categoryRow.innerHTML = `<p>No news available in ${category}.</p>`;
-        newsContainer.appendChild(categoryRow);
-      }
-    } // ✅ Properly closed the `for` loop
-    } catch (error) {
-        console.error("Error fetching news:", error);
-        document.getElementById("news-container").innerHTML = `<p class="text-center text-danger">Failed to load news.</p>`;
-    }
-}
-});
-</script>
-<script>
-  document.addEventListener('DOMContentLoaded', async () => {
-    const carouselContainer = document.querySelector('#carousel-news-container');
-    
-    try {
-      // Fetch the latest news
-      const response = await fetch('https://ai-powered-news-aggregator-backend.onrender.com/api/news?category=general');
-
-      const data = await response.json();
-
-      // Clear the existing carousel items if any
-      carouselContainer.innerHTML = '';
-
-      // Check if news articles are available
-      if (data.articles && data.articles.length > 0) {
-        data.articles.slice(0, 5).forEach((article, index) => {
-          const isActive = index === 0 ? 'active' : ''; // First item should be active
-
-          const carouselItemHTML = `
-            <div class="carousel-item ${isActive}">
-              <img src="${article.image}" class="d-block w-100" alt="${article.title}">
-              <div class="carousel-caption d-none d-md-block">
-                <h5>${article.title}</h5>
-                <p>${article.description || 'No description available'}</p>
-                <a href="${article.url}" target="_blank" class="btn btn-primary">Read More</a>
-              </div>
-            </div>
-          `;
-          carouselContainer.insertAdjacentHTML('beforeend', carouselItemHTML);
-        });
-      } else {
-        carouselContainer.innerHTML = '<p>No news available for the carousel.</p>';
-      }
-    } catch (error) {
-      console.error('Error fetching carousel news:', error);
-      carouselContainer.innerHTML = '<p>Error loading news for the carousel.</p>';
-    }
-  });
-</script>
-<script>
-  const apiKey = "c8f7bbd1aa7b4719ae619139984f2b08"; // Your NewsAPI key
-  const newsContainer = document.getElementById("news-container");
-  const countrySelector = document.getElementById("country-selector");
-  const languageSelector = document.getElementById("language-selector");
-  const API_BASE_URL = "https://ai-powered-news-aggregator-backend.onrender.com";
-
-  async function fetchNews(country, language) {
-    const url = `https://newsapi.org/v2/top-headlines?country=${country}&language=${language}&apiKey=${apiKey}`;
-    
-    document.getElementById("country-selector").addEventListener("change", function () {
-    localStorage.setItem("selectedCountry", this.value);
-    fetchNews(this.value, document.getElementById("language-selector").value);
-});
-
-document.getElementById("language-selector").addEventListener("change", function () {
-    localStorage.setItem("selectedLanguage", this.value);
-    fetchNews(document.getElementById("country-selector").value, this.value);
-});
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/news?country=${country}&language=${language}&category=${category}`);
-        
-        // Check if response is actually JSON
-        const text = await response.text();  // Get raw response
-        console.log("Raw API Response:", text);  // Log response for debugging
-        
-        const data = JSON.parse(text);  // Try parsing as JSON
-        displayNews(data.articles);
-    } catch (error) {
-        console.error("Error fetching news:", error);
-        document.getElementById("news-container").innerHTML = `<p class="text-center text-danger">Failed to load news.</p>`;
-    }
-}
-      
- function displayNews(articles) {
-    newsContainer.innerHTML = "";
-    articles.forEach(article => {
-      const newsCard = `
-        <div class="col-md-4">
-          <div class="card news-card">
-            <img src="${article.image}" class="card-img-top" alt="News Image">
-            <div class="card-body">
-              <h5 class="news-card-title">${article.title}</h5>
-              <p class="news-card-text">${article.description || "No description available."}</p>
-              <a href="${article.url}" class="btn btn-primary" target="_blank">Read More</a>
-            </div>
-          </div>
-        </div>
-      `;
-      newsContainer.innerHTML += newsCard;
-    });
+  } catch (error) {
+    console.error("❌ Error fetching news:", error);
+    document.getElementById("news-container").innerHTML = `<p class="text-center text-danger">Failed to load news.</p>`;
+  } finally {
+    isFetching = false;
   }
+}
 
-  countrySelector.addEventListener("change", () => {
-    const selectedCountry = country-selector.value;
-    const selectedLanguage = language-selector.value;
-    fetchNews(selectedCountry, selectedLanguage);
+function displayNews(articles) {
+  const newsContainer = document.getElementById("news-container");
+  newsContainer.innerHTML = ""; // Clear previous results
+
+  articles.forEach(article => {
+    const categoryRow = document.createElement("div");
+    categoryRow.classList.add("col-md-4"); // Bootstrap column structure
+
+    const categoryHTML = `
+      <div class="card news-card">
+        <img src="${article.image || 'https://via.placeholder.com/300'}" alt="News Image" class="card-img-top">
+        <div class="card-body">
+          <h5 class="news-card-title">${article.category || "General"}</h5>
+          <ul class="news-list">
+            <li>
+              <h6>${article.title}</h6>
+              <p>${article.description || "No description available"}</p>
+              <a href="${article.url}" target="_blank" class="btn btn-primary">Read More</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    `;
+
+    categoryRow.innerHTML = categoryHTML;
+    newsContainer.appendChild(categoryRow);
   });
+}
 
-  languageSelector.addEventListener("change", () => {
-    const selectedCountry = country-selector.value;
-    const selectedLanguage = language-selector.value;
-    fetchNews(selectedCountry, selectedLanguage);
-  });
+// ✅ Call `fetchNews` on page load with default values
+window.onload = function () {
+  const savedCountry = localStorage.getItem("selectedCountry") || "us";
+  const savedLanguage = localStorage.getItem("selectedLanguage") || "en";
 
-  // Load default news (US English) on page load
- 
-  window.onload = function () {
-    let savedCountry = localStorage.getItem("selectedCountry") || "us"; // Default to 'us'
-    let savedLanguage = localStorage.getItem("selectedLanguage") || "en"; // Default to 'en'
-
-    document.getElementById("country-selector").value = savedCountry;
-    document.getElementById("language-selector").value = savedLanguage;
-
-    fetchNews(savedCountry, savedLanguage); // Fetch news using saved preferences
+  fetchNews(savedCountry, savedLanguage);
 };
 
 </script>
 <script>
-document.getElementById("searchButton").addEventListener("click", async function () {
-  const query = document.getElementById("searchInput").value.trim();
-  if (!query) {
-    alert("Please enter a search term!");
-    return;
-  }
-
-  console.log(`🔍 Searching for: ${query}`); // Debugging log
+  document.addEventListener("DOMContentLoaded", async () => {
+  const carouselInner = document.querySelector("#carousel-news-container");
 
   try {
-    const response = await fetch(`https://ai-powered-news-aggregator-backend.onrender.com/api/search?query=${encodeURIComponent(query)}`);
+    // Fetch the latest news
+    const response = await fetch(
+      "https://ai-powered-news-aggregator-backend.onrender.com/api/news?category=general"
+    );
 
     const data = await response.json();
 
-    console.log(`✅ Found ${data.articles.length} results`); // Debugging log
-    displayResults(data.articles);
+    // Clear previous carousel content
+    carouselInner.innerHTML = "";
+
+    if (data.articles && data.articles.length > 0) {
+      data.articles.slice(0, 5).forEach((article, index) => {
+        const isActive = index === 0 ? "active" : "";
+
+        const carouselItemHTML = `
+          <div class="carousel-item ${isActive}">
+            <img src="${
+              article.image || "https://via.placeholder.com/800x400"
+            }" class="d-block w-100" alt="${article.title}">
+            <div class="carousel-caption d-none d-md-block">
+              <h5>${article.title}</h5>
+              <p>${article.description || "No description available"}</p>
+              <a href="${article.url}" target="_blank" class="btn btn-primary">Read More</a>
+            </div>
+          </div>
+        `;
+        carouselInner.insertAdjacentHTML("beforeend", carouselItemHTML);
+      });
+    } else {
+      carouselInner.innerHTML =
+        '<p class="text-center text-warning">No news available.</p>';
+    }
   } catch (error) {
-    console.error("❌ Error fetching search results:", error);
-    alert("Error fetching search results. Please try again.");
+    console.error("❌ Error fetching carousel news:", error);
+    carouselInner.innerHTML =
+      '<p class="text-center text-danger">Error loading news.</p>';
   }
 });
 
-// ✅ Function to display search results correctly
-function displayResults(articles) {
-  const resultsContainer = document.getElementById("searchResults");
-  resultsContainer.innerHTML = ""; // Clear previous results
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+  const apiKey = "c8f7bbd1aa7b4719ae619139984f2b08"; // NewsAPI key
+  const newsContainer = document.getElementById("news-container");
+  const countrySelector = document.getElementById("country-selector");
+  const languageSelector = document.getElementById("language-selector");
 
-  if (articles.length === 0) {
-    resultsContainer.innerHTML = "<p>No results found.</p>";
-    return;
+  const API_BASE_URL =
+    window.location.hostname === "localhost"
+      ? "http://localhost:5000/api"
+      : "https://ai-powered-news-aggregator-backend.onrender.com";
+
+  async function fetchNews(country, language) {
+    const url = `${API_BASE_URL}/news?country=${country}&language=${language}`;
+
+    try {
+      const response = await fetch(url);
+      const text = await response.text(); // Get raw response (for debugging)
+      console.log("Raw API Response:", text);
+
+      const data = JSON.parse(text); // Convert to JSON
+      if (!data.articles || data.articles.length === 0) {
+        newsContainer.innerHTML =
+          "<p class='text-center text-warning'>No news found.</p>";
+        return;
+      }
+
+      displayNews(data.articles);
+    } catch (error) {
+      console.error("Error fetching news:", error);
+      newsContainer.innerHTML =
+        "<p class='text-center text-danger'>Failed to load news.</p>";
+    }
   }
 
-  articles.forEach(article => {
-    const articleElement = document.createElement("div");
-    articleElement.classList.add("news-card"); // ✅ Adding a class for styling
-    articleElement.innerHTML = `
-      <img src="${article.urlToImage || 'https://via.placeholder.com/300'}" alt="News Image" class="news-image">  <!-- ✅ Styled Image -->
-      <div class="news-content">
-        <h3><a href="${article.url}" target="_blank">${article.title}</a></h3>
-        <p>${article.description || "No description available."}</p>
-        <p class="news-meta"><strong>Source:</strong> ${article.source?.name || 'Unknown'} | <strong>Published At:</strong> ${new Date(article.publishedAt).toLocaleString()}</p>
-      </div>
-    `;
-    resultsContainer.appendChild(articleElement);
+  function displayNews(articles) {
+    newsContainer.innerHTML = articles
+      .map(
+        (article) => `
+        <div class="col-md-4">
+          <div class="card news-card">
+            <img src="${
+              article.image || "https://via.placeholder.com/300"
+            }" class="card-img-top" alt="News Image">
+            <div class="card-body">
+              <h5 class="news-card-title">${article.title}</h5>
+              <p class="news-card-text">${
+                article.description || "No description available."
+              }</p>
+              <a href="${article.url}" class="btn btn-primary" target="_blank">Read More</a>
+            </div>
+          </div>
+        </div>`
+      )
+      .join("");
+  }
+
+  // Event listeners for dropdown changes
+  countrySelector.addEventListener("change", () => {
+    const selectedCountry = countrySelector.value;
+    localStorage.setItem("selectedCountry", selectedCountry);
+    fetchNews(selectedCountry, languageSelector.value);
   });
-}
+
+  languageSelector.addEventListener("change", () => {
+    const selectedLanguage = languageSelector.value;
+    localStorage.setItem("selectedLanguage", selectedLanguage);
+    fetchNews(countrySelector.value, selectedLanguage);
+  });
+
+  // Load default news on page load
+  window.onload = function () {
+    const savedCountry = localStorage.getItem("selectedCountry") || "us";
+    const savedLanguage = localStorage.getItem("selectedLanguage") || "en";
+
+    countrySelector.value = savedCountry;
+    languageSelector.value = savedLanguage;
+
+    fetchNews(savedCountry, savedLanguage);
+  };
+});
+
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const searchButton = document.getElementById("searchButton");
+  const searchInput = document.getElementById("searchInput");
+  const resultsContainer = document.getElementById("searchResults");
+
+  const API_BASE_URL = window.location.hostname === "localhost"
+      ? "http://localhost:5000/api"
+      : "https://ai-powered-news-aggregator-backend.onrender.com";
+
+  searchButton.addEventListener("click", async function () {
+    const query = searchInput.value.trim();
+    if (!query) {
+      alert("Please enter a search term!");
+      return;
+    }
+
+    console.log(`🔍 Searching for: ${query}`); // Debugging log
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/search?query=${encodeURIComponent(query)}`);
+      const data = await response.json();
+
+      if (!data.articles || data.articles.length === 0) {
+        resultsContainer.innerHTML = "<p>No results found.</p>";
+        return;
+      }
+
+      console.log(`✅ Found ${data.articles.length} results`); // Debugging log
+      displayResults(data.articles);
+    } catch (error) {
+      console.error("❌ Error fetching search results:", error);
+      alert("Error fetching search results. Please try again.");
+    }
+  });
+
+  function displayResults(articles) {
+    resultsContainer.innerHTML = ""; // Clear previous results
+
+    articles.forEach(article => {
+      const articleElement = document.createElement("div");
+      articleElement.classList.add("news-card");
+
+      articleElement.innerHTML = `
+        <img src="${article.urlToImage ? article.urlToImage : 'https://via.placeholder.com/300'}" 
+             alt="News Image" class="news-image">
+        <div class="news-content">
+          <h3><a href="${article.url}" target="_blank">${article.title}</a></h3>
+          <p>${article.description || "No description available."}</p>
+          <p class="news-meta">
+            <strong>Source:</strong> ${article.source?.name || 'Unknown'} | 
+            <strong>Published At:</strong> ${new Date(article.publishedAt).toLocaleString()}
+          </p>
+        </div>
+      `;
+      resultsContainer.appendChild(articleElement);
+    });
+  }
+});
+
 
 </script>
 
