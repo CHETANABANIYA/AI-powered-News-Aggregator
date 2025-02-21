@@ -6,21 +6,34 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// ✅ Enable CORS with explicit frontend origin
+const allowedOrigins = [
+  'http://localhost:3000', // Local development
+  'https://ainewsify-news.netlify.app', // Netlify frontend
+  'https://ai-news-aggregator-l1bikbomi-chetanabaniyas-projects.vercel.app' // Vercel frontend
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed for this origin'));
+    }
+  },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// ✅ Handle Preflight Requests (CORS)
+app.options('*', cors());
+
 // ✅ API Keys from .env
 const NEWSAPI_KEY = process.env.NEWSAPI_KEY;
 const GNEWS_API_KEY = process.env.GNEWS_API_KEY;
 
-// ✅ Enable CORS for frontend (Allow all domains for now)
-app.use(cors({
-  origin: '*', // Change this to your frontend URL in production
-  methods: ['GET'],
-  allowedHeaders: ['Content-Type']
-}));
-
 // ✅ Supported categories for NewsAPI
 const NEWSAPI_CATEGORIES = ['business', 'entertainment', 'general', 'health', 'science', 'sports', 'technology'];
-
-// ✅ Map NewsAPI categories to GNews topics
 const GNEWS_TOPICS = {
   business: 'business',
   entertainment: 'entertainment',
@@ -31,7 +44,6 @@ const GNEWS_TOPICS = {
   technology: 'technology',
 };
 
-// ✅ Default fallback image
 const DEFAULT_IMAGE = 'https://via.placeholder.com/150?text=No+Image';
 
 // ✅ Route to fetch news
@@ -41,7 +53,7 @@ app.get('/api/news', async (req, res) => {
     const country = req.query.country || 'us';
 
     let url;
-    let useGNews = ['in', 'jp', 'ca'].includes(country); // Use GNews for India, Japan, and Canada
+    let useGNews = ['in', 'jp', 'ca'].includes(country);
 
     if (useGNews) {
       const topic = GNEWS_TOPICS[category] || 'general';
@@ -56,13 +68,11 @@ app.get('/api/news', async (req, res) => {
 
     let response = await axios.get(url);
 
-    // 🔹 If no articles, fallback to /everything for broader results
     if (response.data.articles.length === 0 && !useGNews) {
       url = `https://newsapi.org/v2/everything?q=${category}&language=en&apiKey=${NEWSAPI_KEY}&pageSize=10`;
       response = await axios.get(url);
     }
 
-    // ✅ Normalize response format
     const formattedArticles = response.data.articles.map(article => ({
       title: article.title || 'No Title',
       description: article.description || 'No Description',
@@ -83,6 +93,7 @@ app.get('/api/news', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
 });
+
 
 
 
