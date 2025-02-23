@@ -6,13 +6,14 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ Enable CORS with explicit frontend origin
+// ✅ Allowed Frontend Origins
 const allowedOrigins = [
-  'http://localhost:3000', // Local development
-  'https://ainewsify-news.netlify.app', // Netlify frontend
-  'https://ai-news-aggregator-l1bikbomi-chetanabaniyas-projects.vercel.app' // Vercel frontend
+  'http://localhost:3000', 
+  'https://ainewsify-news.netlify.app', 
+  'https://ai-news-aggregator-l1bikbomi-chetanabaniyas-projects.vercel.app'
 ];
 
+// ✅ CORS Middleware
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -25,28 +26,19 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// ✅ Handle Preflight Requests (CORS)
-app.options('*', cors());
+app.options('*', cors()); // Handle CORS preflight requests
 
 // ✅ API Keys from .env
 const NEWSAPI_KEY = process.env.NEWSAPI_KEY;
 const GNEWS_API_KEY = process.env.GNEWS_API_KEY;
 
-// ✅ Supported categories for NewsAPI
+// ✅ Supported Categories
 const NEWSAPI_CATEGORIES = ['business', 'entertainment', 'general', 'health', 'science', 'sports', 'technology'];
-const GNEWS_TOPICS = {
-  business: 'business',
-  entertainment: 'entertainment',
-  general: 'general',
-  health: 'health',
-  science: 'science',
-  sports: 'sports',
-  technology: 'technology',
-};
+const GNEWS_TOPICS = { business: 'business', entertainment: 'entertainment', general: 'general', health: 'health', science: 'science', sports: 'sports', technology: 'technology' };
 
 const DEFAULT_IMAGE = 'https://via.placeholder.com/150?text=No+Image';
 
-// ✅ Route to fetch news
+// ✅ Route to Fetch News
 app.get('/api/news', async (req, res) => {
   try {
     const category = req.query.category || 'general';
@@ -61,16 +53,23 @@ app.get('/api/news', async (req, res) => {
     } else {
       url = `https://newsapi.org/v2/top-headlines?apiKey=${NEWSAPI_KEY}&pageSize=10&language=en&country=${country}`;
       if (NEWSAPI_CATEGORIES.includes(category)) url += `&category=${category}`;
-      else if (category === 'crypto') url = `https://newsapi.org/v2/everything?q=cryptocurrency&apiKey=${NEWSAPI_KEY}&pageSize=10&language=en`;
-      else if (category === 'stockmarket') url = `https://newsapi.org/v2/everything?q=stock%20market&apiKey=${NEWSAPI_KEY}&pageSize=10&language=en`;
-      else if (category === 'education') url = `https://newsapi.org/v2/everything?q=education&apiKey=${NEWSAPI_KEY}&pageSize=10&language=en`;
+      else {
+        const categoryQueries = {
+          crypto: 'cryptocurrency',
+          stockmarket: 'stock market',
+          education: 'education'
+        };
+        url = `https://newsapi.org/v2/everything?q=${categoryQueries[category] || category}&apiKey=${NEWSAPI_KEY}&pageSize=10&language=en`;
+      }
     }
 
-    let response = await axios.get(url);
+    const response = await axios.get(url);
 
+    // ✅ Fallback to `everything` endpoint if no articles found (only for NewsAPI)
     if (response.data.articles.length === 0 && !useGNews) {
       url = `https://newsapi.org/v2/everything?q=${category}&language=en&apiKey=${NEWSAPI_KEY}&pageSize=10`;
-      response = await axios.get(url);
+      const fallbackResponse = await axios.get(url);
+      response.data.articles = fallbackResponse.data.articles;
     }
 
     const formattedArticles = response.data.articles.map(article => ({
@@ -84,15 +83,14 @@ app.get('/api/news', async (req, res) => {
 
     res.json({ articles: formattedArticles });
   } catch (error) {
-    console.error('Error fetching news:', error.response ? error.response.data : error.message);
-    res.status(500).json({ message: 'Error fetching news', error: error.response ? error.response.data : error.message });
+    console.error('❌ Error fetching news:', error.response?.data || error.message);
+    res.status(500).json({ message: 'Internal Server Error. Please try again later.' });
   }
 });
 
 // ✅ Server Listener
-app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+
 
 
 
