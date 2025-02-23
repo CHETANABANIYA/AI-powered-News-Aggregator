@@ -10,10 +10,11 @@ const PORT = process.env.PORT || 5000;
 const allowedOrigins = [
   'http://localhost:3000', 
   'https://ainewsify-news.netlify.app', 
-  'https://ai-news-aggregator-l1bikbomi-chetanabaniyas-projects.vercel.app'
+  'https://ai-news-aggregator-l1bikbomi-chetanabaniyas-projects.vercel.app',
+  'https://ai-powered-news-aggregator-3om085y9l-chetanabaniyas-projects.vercel.app' // ✅ Added your latest Vercel deployment
 ];
 
-// ✅ CORS Middleware
+// ✅ CORS Middleware (Now Fully Handles Preflight Requests)
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -26,11 +27,15 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.options('*', cors()); // Handle CORS preflight requests
+app.options('*', cors()); // ✅ Handles CORS preflight requests
 
-// ✅ API Keys from .env
+// ✅ API Keys from .env (Ensure they exist)
 const NEWSAPI_KEY = process.env.NEWSAPI_KEY;
 const GNEWS_API_KEY = process.env.GNEWS_API_KEY;
+if (!NEWSAPI_KEY || !GNEWS_API_KEY) {
+  console.error('❌ Missing API Keys: Check your .env file or Vercel/Render environment variables.');
+  process.exit(1);
+}
 
 // ✅ Supported Categories
 const NEWSAPI_CATEGORIES = ['business', 'entertainment', 'general', 'health', 'science', 'sports', 'technology'];
@@ -88,8 +93,15 @@ app.get('/api/news', async (req, res) => {
   }
 });
 
+// ✅ Global Error Handler
+app.use((err, req, res, next) => {
+  console.error('🔥 Backend Error:', err.message);
+  res.status(500).json({ message: err.message || 'Internal Server Error' });
+});
+
 // ✅ Server Listener
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+
 
 
 
