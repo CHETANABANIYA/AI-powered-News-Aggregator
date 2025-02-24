@@ -4,7 +4,8 @@
   "description": "AI-Powered News Aggregator",
   "main": "server.js",
   "scripts": {
-    "start": "concurrently \"node index.js\" \"serve -s build -l 3000\"",
+    "start": "node index.js",
+    "start-frontend": "npx serve -s build -l 3000",
     "start-backend": "node server.js",
     "build": "react-scripts build",
     "postinstall": "npm run build",
