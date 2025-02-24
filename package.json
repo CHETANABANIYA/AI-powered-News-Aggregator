@@ -4,7 +4,7 @@
   "description": "AI-Powered News Aggregator",
   "main": "server.js",
   "scripts": {
-    "start": "concurrently \"node index.js\" \"npx serve -s build -l 3000\"",
+    "start": "node server.js & npx serve -s build -l 3000",
     "start-backend": "node server.js",
     "build": "react-scripts build",
     "postinstall": "npm run build",
@@ -22,7 +22,7 @@
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.1.3",
     "react-scripts": "^5.0.1",
-    "serve": "^14.2.0"
+    "serve": "^14.2.4"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
@@ -53,7 +53,14 @@
     "type": "git",
     "url": "https://github.com/CHETANABANIYA/ai-news-aggregator.git"
   },
-  "keywords": ["news", "aggregator", "AI", "React", "Node.js", "Express"],
+  "keywords": [
+    "news",
+    "aggregator",
+    "AI",
+    "React",
+    "Node.js",
+    "Express"
+  ],
   "author": "Chetana Baniya",
   "license": "ISC",
   "bugs": {
@@ -61,5 +68,3 @@
   },
   "homepage": "./"
 }
-
-
