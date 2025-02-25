@@ -5,9 +5,9 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ Enable CORS (Optional: Restrict to allowed domains in production)
+// ✅ Enable CORS (Change '*' to your frontend domain in production)
 app.use(cors({
-    origin: '*', // Replace '*' with your frontend domain for security
+    origin: '*', 
     methods: 'GET,POST',
     allowedHeaders: 'Content-Type'
 }));
@@ -37,9 +37,9 @@ app.get('*', (req, res) => {
     });
 });
 
-// ✅ Start the server
-app.listen(PORT, () => {
-    console.log(`🚀 Frontend server running at http://localhost:${PORT}`);
+// ✅ Start the server (Bind to 0.0.0.0 for Render Deployment)
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Frontend server running at http://0.0.0.0:${PORT}`);
 });
 
 
