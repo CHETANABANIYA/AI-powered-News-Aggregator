@@ -319,71 +319,97 @@
   </head>
 <body>
 <div id="root"></div> 
-<nav class="navbar navbar-expand-lg">
-  <div class="container">
-    <a class="navbar-brand" href="#">NewsSphere</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="Categories.html">Categories</a></li>
-        <li class="nav-item"><a class="nav-link" href="Contact.html">Contact</a></li>
-        <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
-        <li class="nav-item">
-          <select id="country-selector" class="form-select bg-dark text-light border-0">
-    <optgroup label="🌍 North America">
-        <option value="us">🇺🇸 US</option>
-        <option value="ca">🇨🇦 Canada</option>
-        <option value="mx">🇲🇽 Mexico</option>
-    </optgroup>
-    <optgroup label="🌍 Europe">
-        <option value="gb">🇬🇧 UK</option>
-        <option value="de">🇩🇪 Germany</option>
-        <option value="fr">🇫🇷 France</option>
-        <option value="it">🇮🇹 Italy</option>
-        <option value="es">🇪🇸 Spain</option>
-        <option value="se">🇸🇪 Sweden</option>
-        <option value="ch">🇨🇭 Switzerland</option>
-        <option value="nl">🇳🇱 Netherlands</option>
-    </optgroup>
-    <optgroup label="🌍 Asia">
-        <option value="in">🇮🇳 India</option>
-        <option value="jp">🇯🇵 Japan</option>
-        <option value="cn">🇨🇳 China</option>
-        <option value="kr">🇰🇷 South Korea</option>
-        <option value="id">🇮🇩 Indonesia</option>
-        <option value="sa">🇸🇦 Saudi Arabia</option>
-        <option value="sg">🇸🇬 Singapore</option> 
-    </optgroup>
-    <optgroup label="🌍 Other">
-        <option value="br">🇧🇷 Brazil</option>
-        <option value="ae">🇦🇪 UAE</option>
-        <option value="ru">🇷🇺 Russia</option>
-        <option value="za">🇿🇦 South Africa</option>
-        <option value="ar">🇦🇷 Argentina</option>
-        <option value="au">🇦🇺 Australia</option>
-    </optgroup>
-</select>
-    </li>
-        <li class="nav-item d-flex align-items-center">
-          <label for="language-selector" class="me-2 text-white fw-bold">🌐</label>
-          <select id="language-selector" class="form-select form-select-sm bg-dark text-light border-0">
-    <option value="en">🇬🇧 English</option>
-    <option value="fr">🇫🇷 French</option>
-    <option value="es">🇪🇸 Spanish</option>
-    <option value="hi">🇮🇳 Hindi</option>
-    <option value="ja">🇯🇵 Japanese</option>
-    <option value="de">🇩🇪 German</option>
-    <option value="ru">🇷🇺 Russian</option>
-    <option value="zh">🇨🇳 Chinese</option>
-</select>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
+import React from "react";
+
+function Navbar() {
+  return (
+    <nav className="navbar navbar-expand-lg">
+      <div className="container">
+        <a className="navbar-brand" href="#">NewsSphere</a>
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+        <div className="collapse navbar-collapse" id="navbarNav">
+          <ul className="navbar-nav ms-auto">
+            <li className="nav-item">
+              <a className="nav-link" href="index.html">Home</a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="Categories.html">Categories</a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="Contact.html">Contact</a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="login.html">Login</a>
+            </li>
+
+            {/* Country Selector */}
+            <li className="nav-item">
+              <select id="country-selector" className="form-select bg-dark text-light border-0">
+                <optgroup label="🌍 North America">
+                  <option value="us">🇺🇸 US</option>
+                  <option value="ca">🇨🇦 Canada</option>
+                  <option value="mx">🇲🇽 Mexico</option>
+                </optgroup>
+                <optgroup label="🌍 Europe">
+                  <option value="gb">🇬🇧 UK</option>
+                  <option value="de">🇩🇪 Germany</option>
+                  <option value="fr">🇫🇷 France</option>
+                  <option value="it">🇮🇹 Italy</option>
+                  <option value="es">🇪🇸 Spain</option>
+                  <option value="se">🇸🇪 Sweden</option>
+                  <option value="ch">🇨🇭 Switzerland</option>
+                  <option value="nl">🇳🇱 Netherlands</option>
+                </optgroup>
+                <optgroup label="🌍 Asia">
+                  <option value="in">🇮🇳 India</option>
+                  <option value="jp">🇯🇵 Japan</option>
+                  <option value="cn">🇨🇳 China</option>
+                  <option value="kr">🇰🇷 South Korea</option>
+                  <option value="id">🇮🇩 Indonesia</option>
+                  <option value="sa">🇸🇦 Saudi Arabia</option>
+                  <option value="sg">🇸🇬 Singapore</option>
+                </optgroup>
+                <optgroup label="🌍 Other">
+                  <option value="br">🇧🇷 Brazil</option>
+                  <option value="ae">🇦🇪 UAE</option>
+                  <option value="ru">🇷🇺 Russia</option>
+                  <option value="za">🇿🇦 South Africa</option>
+                  <option value="ar">🇦🇷 Argentina</option>
+                  <option value="au">🇦🇺 Australia</option>
+                </optgroup>
+              </select>
+            </li>
+
+            {/* Language Selector */}
+            <li className="nav-item d-flex align-items-center">
+              <label htmlFor="language-selector" className="me-2 text-white fw-bold">🌐</label>
+              <select id="language-selector" className="form-select form-select-sm bg-dark text-light border-0">
+                <option value="en">🇬🇧 English</option>
+                <option value="fr">🇫🇷 French</option>
+                <option value="es">🇪🇸 Spanish</option>
+                <option value="hi">🇮🇳 Hindi</option>
+                <option value="ja">🇯🇵 Japanese</option>
+                <option value="de">🇩🇪 German</option>
+                <option value="ru">🇷🇺 Russian</option>
+                <option value="zh">🇨🇳 Chinese</option>
+              </select>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+export default Navbar;
+
 <section class="hero-section">
   <h1>AI-Powered News Aggregator</h1>
   <p>Your one-stop platform for curated, real-time news updates.</p>
