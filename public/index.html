@@ -417,115 +417,135 @@
 </section>
 
 <script>
- document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
     const categories = ['sports', 'entertainment', 'technology', 'business', 'stockmarket', 'health'];
     const newsContainer = document.querySelector('#category-news-container');
     const carouselContainer = document.querySelector('#carousel-news-container');
     const countrySelector = document.querySelector('#country-selector');
     const languageSelector = document.querySelector('#language-selector');
 
-    // ✅ Fixed API_BASE_URL declaration
+    // ✅ Check if country and language selectors exist
+    if (!countrySelector || !languageSelector) {
+        console.error("Error: #country-selector or #language-selector not found!");
+        return;
+    }
+
     const API_BASE_URL = window.location.hostname === "localhost"
         ? "http://localhost:5000/api"
         : "https://ai-powered-news-aggregator-backend.onrender.com";
 
-    let selectedCountry = localStorage.getItem("selectedCountry") || "us"; // Default country
-    let selectedLanguage = localStorage.getItem("selectedLanguage") || "en"; // Default language
+    let selectedCountry = localStorage.getItem("selectedCountry") || "us"; 
+    let selectedLanguage = localStorage.getItem("selectedLanguage") || "en"; 
 
     countrySelector.value = selectedCountry;
     languageSelector.value = selectedLanguage;
 
     async function fetchNewsByCategory() {
-    newsContainer.innerHTML = '<p>Loading news...</p>';
-
-    try {
-        newsContainer.innerHTML = ''; // Clear previous news
-
-        for (const category of categories) {
-            const categoryRow = document.createElement('div');
-            categoryRow.classList.add('col-md-4', 'mb-4');
-
-            const apiUrl = `${API_BASE_URL}/news?category=${category}&country=${selectedCountry}&language=${selectedLanguage}`;
-            const response = await fetch(apiUrl);
-            const data = await response.json();
-
-            if (data.articles && data.articles.length > 0) {
-                const article = data.articles[0];
-                categoryRow.innerHTML = `
-                    <div class="card news-card">
-                        <img src="${article.image || 'default-news.jpg'}" alt="${category}" class="card-img-top">
-                        <div class="card-body">
-                            <h5 class="news-card-title">${article.title || 'No title available'}</h5>
-                            <p class="news-card-text">${article.description || 'No description available.'}</p>
-                            <a href="${article.url}" target="_blank" class="btn btn-primary">Read More</a>
-                        </div>
-                    </div>`;
-            } else {
-                categoryRow.innerHTML = `<p>No news found for ${category}.</p>`;
-            }
-
-            newsContainer.appendChild(categoryRow);
+        if (!newsContainer) {
+            console.error("Error: #category-news-container not found!");
+            return;
         }
-    } catch (error) {
-        newsContainer.innerHTML = `<p>Error fetching news. Please try again later.</p>`;
-        console.error("Error fetching news:", error);
-    }
-}
 
+        newsContainer.innerHTML = '<p>Loading news...</p>';
+
+        try {
+            newsContainer.innerHTML = ''; 
+
+            for (const category of categories) {
+                const categoryRow = document.createElement('div');
+                categoryRow.classList.add('col-md-4', 'mb-4');
+
+                const apiUrl = `${API_BASE_URL}/news?category=${category}&country=${selectedCountry}&language=${selectedLanguage}`;
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (data.articles && data.articles.length > 0) {
+                    const article = data.articles[0];
+                    categoryRow.innerHTML = `
+                        <div class="card news-card">
+                            <img src="${article.image || 'default-news.jpg'}" alt="${category}" class="card-img-top">
+                            <div class="card-body">
+                                <h5 class="news-card-title">${article.title || 'No title available'}</h5>
+                                <p class="news-card-text">${article.description || 'No description available.'}</p>
+                                <a href="${article.url}" target="_blank" class="btn btn-primary">Read More</a>
+                            </div>
+                        </div>`;
+                } else {
+                    categoryRow.innerHTML = `<p>No news found for ${category}.</p>`;
+                }
+
+                newsContainer.appendChild(categoryRow);
+            }
+        } catch (error) {
+            newsContainer.innerHTML = `<p>Error fetching news. Please try again later.</p>`;
+            console.error("Error fetching news:", error);
+        }
+    }
 
     async function fetchCarouselNews() {
-      carouselContainer.innerHTML = '<p>Loading news...</p>';
-
-      try {
-        const response = await fetch(`${API_BASE_URL}/news?category=general&country=${selectedCountry}&language=${selectedLanguage}`);
-        const data = await response.json();
-        carouselContainer.innerHTML = ''; // Clear previous news
-
-        if (data.articles && data.articles.length > 0) {
-          data.articles.slice(0, 5).forEach((article, index) => {
-            const isActive = index === 0 ? 'active' : '';
-
-            const carouselItemHTML = `
-              <div class="carousel-item ${isActive}">
-                <img src="${article.image}" class="d-block w-100" alt="${article.title}">
-                <div class="carousel-caption d-none d-md-block">
-                  <h5>${article.title}</h5>
-                  <p>${article.description || 'No description available'}</p>
-                  <a href="${article.url}" target="_blank" class="btn btn-primary">Read More</a>
-                </div>
-              </div>
-            `;
-            carouselContainer.insertAdjacentHTML('beforeend', carouselItemHTML);
-          });
-        } else {
-          carouselContainer.innerHTML = '<p>No news available for the carousel.</p>';
+        if (!carouselContainer) {
+            console.error("Error: #carousel-news-container not found!");
+            return;
         }
-      } catch (error) {
-        console.error('Error fetching carousel news:', error);
-        carouselContainer.innerHTML = '<p>Error loading carousel news.</p>';
-      }
+
+        carouselContainer.innerHTML = '<p>Loading news...</p>';
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/news?category=general&country=${selectedCountry}&language=${selectedLanguage}`);
+            const data = await response.json();
+            carouselContainer.innerHTML = ''; 
+
+            if (data.articles && data.articles.length > 0) {
+                data.articles.slice(0, 5).forEach((article, index) => {
+                    const isActive = index === 0 ? 'active' : '';
+
+                    const carouselItemHTML = `
+                        <div class="carousel-item ${isActive}">
+                            <img src="${article.image}" class="d-block w-100" alt="${article.title}">
+                            <div class="carousel-caption d-none d-md-block">
+                                <h5>${article.title}</h5>
+                                <p>${article.description || 'No description available'}</p>
+                                <a href="${article.url}" target="_blank" class="btn btn-primary">Read More</a>
+                            </div>
+                        </div>
+                    `;
+                    carouselContainer.insertAdjacentHTML('beforeend', carouselItemHTML);
+                });
+            } else {
+                carouselContainer.innerHTML = '<p>No news available for the carousel.</p>';
+            }
+        } catch (error) {
+            console.error('Error fetching carousel news:', error);
+            carouselContainer.innerHTML = '<p>Error loading carousel news.</p>';
+        }
     }
 
     function fetchAllNews() {
-      fetchNewsByCategory();
-      fetchCarouselNews();
+        fetchNewsByCategory();
+        fetchCarouselNews();
     }
-   // Event Listeners for Country & Language Selection
-    countrySelector.addEventListener("change", () => {
-      selectedCountry = countrySelector.value;
-      localStorage.setItem("selectedCountry", selectedCountry);
-      fetchAllNews();
-    });
 
-    languageSelector.addEventListener("change", () => {
-      selectedLanguage = languageSelector.value;
-      localStorage.setItem("selectedLanguage", selectedLanguage);
-      fetchAllNews();
-    });
+    // ✅ Check before adding event listeners
+    if (countrySelector) {
+        countrySelector.addEventListener("change", () => {
+            selectedCountry = countrySelector.value;
+            localStorage.setItem("selectedCountry", selectedCountry);
+            fetchAllNews();
+        });
+    }
+
+    if (languageSelector) {
+        languageSelector.addEventListener("change", () => {
+            selectedLanguage = languageSelector.value;
+            localStorage.setItem("selectedLanguage", selectedLanguage);
+            fetchAllNews();
+        });
+    }
 
     // Fetch news on page load
     fetchAllNews();
 });
+
 </script>
       <!-- Subscription Section -->
   <section class="subscription-section">
@@ -578,6 +598,7 @@ const API_BASE_URL = window.location.hostname === "localhost"
   ? "http://localhost:5000/api"
   : "https://ai-powered-news-aggregator-backend.onrender.com/api";
 
+// ✅ Fetch News Function
 async function fetchNews(country = "us", language = "en") {
   if (isFetching) return;
   isFetching = true;
@@ -599,8 +620,11 @@ async function fetchNews(country = "us", language = "en") {
   }
 }
 
+// ✅ Display News
 function displayNews(articles) {
   const newsContainer = document.getElementById("news-container");
+  if (!newsContainer) return console.error("❌ Error: #news-container not found!");
+  
   newsContainer.innerHTML = articles.map(article => `
     <div class="col-md-4">
       <div class="card news-card">
@@ -622,26 +646,25 @@ window.onload = () => {
   fetchNews(savedCountry, savedLanguage);
 };
 
-// ✅ Carousel News
+// ✅ Fetch Carousel News
 document.addEventListener("DOMContentLoaded", async () => {
   const carouselInner = document.querySelector("#carousel-news-container");
+  if (!carouselInner) return console.error("❌ Error: #carousel-news-container not found!");
 
   try {
     const response = await fetch(`${API_BASE_URL}/news?category=general`);
     const data = await response.json();
     
-    carouselInner.innerHTML = data.articles?.length 
-      ? data.articles.slice(0, 5).map((article, index) => `
-        <div class="carousel-item ${index === 0 ? "active" : ""}">
-          <img src="${article.image || 'https://via.placeholder.com/800x400'}" class="d-block w-100" alt="${article.title}">
-          <div class="carousel-caption d-none d-md-block">
-            <h5>${article.title}</h5>
-            <p>${article.description || "No description available"}</p>
-            <a href="${article.url}" target="_blank" class="btn btn-primary">Read More</a>
-          </div>
+    carouselInner.innerHTML = data.articles?.slice(0, 5).map((article, index) => `
+      <div class="carousel-item ${index === 0 ? "active" : ""}">
+        <img src="${article.image || 'https://via.placeholder.com/800x400'}" class="d-block w-100" alt="${article.title}">
+        <div class="carousel-caption d-none d-md-block">
+          <h5>${article.title}</h5>
+          <p>${article.description || "No description available"}</p>
+          <a href="${article.url}" target="_blank" class="btn btn-primary">Read More</a>
         </div>
-      `).join("")
-      : '<p class="text-center text-warning">No news available.</p>';
+      </div>
+    `).join("") || '<p class="text-center text-warning">No news available.</p>';
   } catch (error) {
     console.error("❌ Error fetching carousel news:", error);
     carouselInner.innerHTML = '<p class="text-center text-danger">Error loading news.</p>';
@@ -653,19 +676,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const countrySelector = document.getElementById("country-selector");
   const languageSelector = document.getElementById("language-selector");
 
+  if (!countrySelector || !languageSelector) {
+    console.error("❌ Error: #country-selector or #language-selector not found!");
+    return;
+  }
+
   countrySelector.addEventListener("change", () => {
     const country = countrySelector.value;
+    const language = languageSelector.value;
     localStorage.setItem("selectedCountry", country);
-    fetchNews(country, languageSelector.value);
+    fetchNews(country, language);
   });
 
   languageSelector.addEventListener("change", () => {
+    const country = countrySelector.value;
     const language = languageSelector.value;
     localStorage.setItem("selectedLanguage", language);
-    fetchNews(countrySelector.value, language);
+    fetchNews(country, language);
   });
 
-  // Set dropdown values from localStorage
+  // ✅ Set dropdown values from localStorage
   countrySelector.value = localStorage.getItem("selectedCountry") || "us";
   languageSelector.value = localStorage.getItem("selectedLanguage") || "en";
 });
@@ -675,6 +705,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchButton = document.getElementById("searchButton");
   const searchInput = document.getElementById("searchInput");
   const resultsContainer = document.getElementById("searchResults");
+
+  if (!searchButton || !searchInput || !resultsContainer) {
+    console.error("❌ Error: Search elements not found!");
+    return;
+  }
 
   searchButton.addEventListener("click", async () => {
     const query = searchInput.value.trim();
@@ -703,6 +738,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
 </script>
 
 
