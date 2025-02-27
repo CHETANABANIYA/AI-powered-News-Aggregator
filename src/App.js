@@ -7,7 +7,9 @@ import NewsCategories from './components/NewsCategories';
 import SubscriptionSection from './components/SubscriptionSection';
 import Footer from './components/Footer';
 import Home from './components/Home';
-import Login from './components/Login';
+
+import Login from './components/login';
+
 
 function App() {
   return (
