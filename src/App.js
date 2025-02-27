@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import Carousel from './components/Carousel';
@@ -13,10 +13,10 @@ function App() {
   return (
     <Router>
       <Navbar />
-      <Switch>
-        <Route path="/" exact component={Home} />
-        <Route path="/login" component={Login} />
-      </Switch>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
       <HeroSection />
       <Carousel />
       <NewsCategories />
@@ -27,4 +27,5 @@ function App() {
 }
 
 export default App;
+
 
