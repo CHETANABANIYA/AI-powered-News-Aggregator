@@ -19,11 +19,12 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.warn(`❌ CORS blocked request from: ${origin}`);
       callback(new Error("Not allowed by CORS"));
     }
   },
-  methods: 'GET',
-  allowedHeaders: 'Content-Type'
+  methods: ['GET'],
+  allowedHeaders: ['Content-Type']
 }));
 
 app.use(express.json());
@@ -81,6 +82,7 @@ app.get('/api/news', async (req, res) => {
     // ✅ Check cache first
     const cachedData = await redisClient.get(redisKey);
     if (cachedData) {
+      console.log("✅ Serving news from cache");
       return res.json(JSON.parse(cachedData));
     }
 
@@ -103,4 +105,5 @@ app.get('/api/news', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
 
