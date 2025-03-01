@@ -12,13 +12,11 @@ const PORT = process.env.PORT || 5000;
 const NEWS_API_KEY = process.env.NEWS_API_KEY || 'c8f7bbd1aa7b4719ae619139984f2b08';
 const GNEWS_API_KEY = process.env.GNEWS_API_KEY || '10998e49626e56d8e92a5a9470f0d169';
 
-// ✅ Enable CORS (Allow localhost and Vercel frontend)
+// ✅ Enable CORS
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://ai-news-aggregator-l1bikbomi-chetanabaniyas-projects.vercel.app",
-  "https://ai-powered-news-aggregator.vercel.app" // ✅ Added Vercel frontend
+  "https://ai-news-aggregator-l1bikbomi-chetanabaniyas-projects.vercel.app"
 ];
-
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -117,6 +115,7 @@ app.get('/api/news', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
 
 
 

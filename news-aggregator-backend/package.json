@@ -1,16 +1,17 @@
 {
   "name": "news-aggregator-backend",
   "version": "1.0.0",
-  "main": "server30.js",
+  "description": "Backend for AI-Powered News Aggregator",
+  "main": "server.js",
   "scripts": {
-    "start": "node server30.js"
+    "start": "node server.js"
   },
   "engines": {
     "node": ">=18 <=22"
   },
   "dependencies": {
     "@mailchimp/mailchimp_marketing": "^3.0.80",
-    "axios": "^1.7.9",
+    "axios": "^1.8.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
@@ -18,4 +19,5 @@
     "redis": "^4.7.0"
   }
 }
+
 
