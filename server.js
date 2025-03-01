@@ -8,15 +8,15 @@ const rateLimit = require('express-rate-limit');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ API Keys
+// API Keys
 const NEWS_API_KEY = process.env.NEWS_API_KEY || 'c8f7bbd1aa7b4719ae619139984f2b08';
 const GNEWS_API_KEY = process.env.GNEWS_API_KEY || '10998e49626e56d8e92a5a9470f0d169';
-const REDIS_URL = process.env.REDIS_URL || "redis://default:AWr_AAIjcDFkYWI2MWQ2MTA1OTQ0NWE4YTFjYTVmN2FhMDVhM2UzZXAxMA@closing-mantis-27391.upstash.io:6379";
+const REDIS_URL = process.env.REDIS_URL || "redis://default:AWr_AAIjcDFkYWI2MWQ2MTA1OTQ0NWE4YTFjYTVmN2FhMDVhM2UzZXAxMA@closing-mantis-27391.upstash.io:6379"
 
-// ✅ Enable CORS
+// Enable CORS
 const allowedOrigins = [
-  "http://localhost:3000",
-  "https://ai-news-aggregator-l1bikbomi-chetanabaniyas-projects.vercel.app"
+  'http://localhost:3000',
+  'https://ai-powered-news-aggregator.vercel.app'
 ];
 app.use(cors({
   origin: (origin, callback) => {
@@ -24,7 +24,7 @@ app.use(cors({
       callback(null, true);
     } else {
       console.warn(`❌ CORS blocked: ${origin}`);
-      callback(new Error("Not allowed by CORS"));
+      callback(new Error('Not allowed by CORS'));
     }
   },
   methods: ['GET'],
@@ -33,7 +33,7 @@ app.use(cors({
 
 app.use(express.json());
 
-// ✅ Rate Limiting (50 requests per 10 minutes)
+// Rate Limiting (50 requests per 10 minutes)
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: 50,
@@ -41,7 +41,7 @@ const limiter = rateLimit({
 });
 app.use('/api/news', limiter);
 
-// ✅ Redis Client Setup
+// Redis Client Setup
 const redisClient = redis.createClient({
   url: REDIS_URL,
   socket: { tls: true }
@@ -49,10 +49,10 @@ const redisClient = redis.createClient({
 
 redisClient.on('error', (err) => console.error(`❌ Redis Error: ${err.message}`));
 redisClient.connect()
-  .then(() => console.log("✅ Connected to Redis"))
-  .catch((err) => console.error("❌ Redis Connection Failed:", err.message));
+  .then(() => console.log('✅ Connected to Redis'))
+  .catch((err) => console.error('❌ Redis Connection Failed:', err.message));
 
-// ✅ Function to Fetch News from APIs
+// Function to Fetch News from APIs
 const fetchNewsFromAPIs = async (category, country, language) => {
   const newsAPIUrl = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&language=${language}&apiKey=${NEWS_API_KEY}`;
   const gnewsAPIUrl = `https://gnews.io/api/v4/top-headlines?category=${category}&country=${country}&lang=${language}&apikey=${GNEWS_API_KEY}`;
@@ -62,9 +62,9 @@ const fetchNewsFromAPIs = async (category, country, language) => {
     if (newsAPIResponse.data?.articles?.length > 0) {
       return newsAPIResponse.data;
     }
-    console.warn("⚠️ NewsAPI returned no results. Trying GNews...");
+    console.warn('⚠️ NewsAPI returned no results. Trying GNews...');
   } catch (error) {
-    console.error("❌ NewsAPI Error:", error.response?.data || error.message);
+    console.error('❌ NewsAPI Error:', error.response?.data || error.message);
   }
 
   try {
@@ -72,53 +72,53 @@ const fetchNewsFromAPIs = async (category, country, language) => {
     if (gnewsResponse.data?.articles?.length > 0) {
       return gnewsResponse.data;
     }
-    console.warn("⚠️ GNews also returned no results.");
+    console.warn('⚠️ GNews also returned no results.');
   } catch (error) {
-    console.error("❌ GNews Error:", error.response?.data || error.message);
+    console.error('❌ GNews Error:', error.response?.data || error.message);
   }
 
   return { articles: [] };
 };
 
-// ✅ News API Route with Caching
+// News API Route with Caching
 app.get('/api/news', async (req, res) => {
   const { category = 'general', country = 'us', language = 'en' } = req.query;
   const redisKey = `news:${country}:${category}:${language}`;
 
   try {
-    // ✅ Check Redis Cache
+    // Check Redis Cache
     const cachedData = await redisClient.get(redisKey);
     
     if (cachedData) {
       try {
         const parsedData = JSON.parse(cachedData);
         if (parsedData.articles && Array.isArray(parsedData.articles)) {
-          console.log("✅ Serving news from cache");
+          console.log('✅ Serving news from cache');
           return res.json(parsedData);
         } else {
-          console.warn("⚠️ Cache contained invalid data. Fetching fresh news.");
+          console.warn('⚠️ Cache contained invalid data. Fetching fresh news.');
         }
       } catch (parseError) {
-        console.error("❌ Redis Cache Parsing Error:", parseError.message);
+        console.error('❌ Redis Cache Parsing Error:', parseError.message);
       }
     }
 
-    // ✅ Fetch News from APIs
+    // Fetch News from APIs
     const newsData = await fetchNewsFromAPIs(category, country, language);
 
-    // ✅ Cache Valid Response
+    // Cache Valid Response
     if (newsData.articles.length > 0) {
       await redisClient.setEx(redisKey, 1800, JSON.stringify(newsData)); // Cache for 30 mins
     }
 
     res.json(newsData);
   } catch (error) {
-    console.error("❌ Error fetching news:", error.message);
-    res.status(500).json({ error: "Failed to fetch news" });
+    console.error('❌ Error fetching news:', error.message);
+    res.status(500).json({ error: 'Failed to fetch news' });
   }
 });
 
-// ✅ Start Server
+// Start Server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
