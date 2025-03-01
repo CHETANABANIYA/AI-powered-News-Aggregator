@@ -11,14 +11,13 @@ const PORT = process.env.PORT || 5000;
 // ✅ API Keys
 const NEWS_API_KEY = process.env.NEWS_API_KEY || 'c8f7bbd1aa7b4719ae619139984f2b08';
 const GNEWS_API_KEY = process.env.GNEWS_API_KEY || '10998e49626e56d8e92a5a9470f0d169';
+const REDIS_URL = process.env.REDIS_URL || "redis://default:AWr_AAIjcDFkYWI2MWQ2MTA1OTQ0NWE4YTFjYTVmN2FhMDVhM2UzZXAxMA@closing-mantis-27391.upstash.io:6379";
 
-// ✅ Enable CORS (Allow localhost and Vercel frontend)
+// ✅ Enable CORS
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://ai-news-aggregator-l1bikbomi-chetanabaniyas-projects.vercel.app",
-  "https://ai-powered-news-aggregator.vercel.app" // ✅ Added Vercel frontend
+  "https://ai-news-aggregator-l1bikbomi-chetanabaniyas-projects.vercel.app"
 ];
-
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -43,9 +42,15 @@ const limiter = rateLimit({
 app.use('/api/news', limiter);
 
 // ✅ Redis Client Setup
-const redisClient = redis.createClient();
-redisClient.on('error', (err) => console.error(`❌ Redis Error: ${err}`));
-redisClient.connect().catch(console.error);
+const redisClient = redis.createClient({
+  url: REDIS_URL,
+  socket: { tls: true }
+});
+
+redisClient.on('error', (err) => console.error(`❌ Redis Error: ${err.message}`));
+redisClient.connect()
+  .then(() => console.log("✅ Connected to Redis"))
+  .catch((err) => console.error("❌ Redis Connection Failed:", err.message));
 
 // ✅ Function to Fetch News from APIs
 const fetchNewsFromAPIs = async (category, country, language) => {
@@ -117,6 +122,7 @@ app.get('/api/news', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
 
 
 
