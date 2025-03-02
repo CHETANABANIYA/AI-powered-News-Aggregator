@@ -589,22 +589,22 @@ const API_BASE_URL = window.location.hostname === "localhost"
   : "https://ai-powered-news-aggregator-backend.onrender.com/api";
 
 document.addEventListener("DOMContentLoaded", () => {
+  // ✅ DOM Elements
   const newsContainer = document.getElementById("news-container");
   const carouselInner = document.getElementById("carousel-news-container");
+  const categoryNewsContainer = document.getElementById("category-news-container");
   const countrySelector = document.getElementById("country-selector");
   const languageSelector = document.getElementById("language-selector");
   const searchButton = document.getElementById("searchButton");
   const searchInput = document.getElementById("searchInput");
   const resultsContainer = document.getElementById("searchResults");
-  const categoryNewsContainer = document.getElementById("category-news-container");
 
-  if (!newsContainer || !carouselInner || !countrySelector || !languageSelector || !searchButton || !searchInput || !resultsContainer || !categoryNewsContainer) {
+  if (!newsContainer || !carouselInner || !categoryNewsContainer || !countrySelector || !languageSelector || !searchButton || !searchInput || !resultsContainer) {
     console.error("❌ Missing one or more required elements in the HTML.");
     return;
   }
 
-  const categories = ['sports', 'entertainment', 'technology', 'business', 'education', 'stockmarket', 'crypto', 'health'];
-
+  // ✅ Fetch General News
   async function fetchNews(country = "us", language = "en") {
     if (isFetching) return;
     isFetching = true;
@@ -635,6 +635,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // ✅ Fetch Carousel News
   async function fetchCarouselNews() {
     carouselInner.innerHTML = '<p class="text-center text-info">Loading carousel news...</p>';
 
@@ -659,6 +660,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // ✅ Fetch Category News
+  const categories = ['sports', 'entertainment', 'technology', 'business', 'education', 'health', 'stockmarket', 'crypto'];
+
   async function fetchCategoryNews(category) {
     try {
       const response = await fetch(`${API_BASE_URL}/news?category=${category}&country=us&language=en`);
@@ -673,35 +677,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadAllCategoriesNews() {
     categoryNewsContainer.innerHTML = '<p class="text-center text-info">Loading category news...</p>';
-
-    let categoryContent = '';
+    let categoryContent = '<div class="row">';
 
     for (const category of categories) {
       const articles = await fetchCategoryNews(category);
       if (articles.length === 0) continue;
 
       categoryContent += `
-        <div class="category-section mb-4">
-            <h3 class="text-primary">${category.charAt(0).toUpperCase() + category.slice(1)} News</h3>
-            <div class="row">
-                ${articles.slice(0, 4).map(article => `
-                    <div class="col-md-3">
-                        <div class="card news-card">
-                            <img src="${article.image || 'https://via.placeholder.com/300'}" class="card-img-top" alt="News Image">
-                            <div class="card-body">
-                                <h5 class="card-title">${article.title}</h5>
-                                <p class="card-text">${article.description || 'No description available.'}</p>
-                                <a href="${article.url}" target="_blank" class="btn btn-primary">Read More</a>
-                            </div>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
+        <div class="col-md-3">
+          <h3 class="text-primary text-center">${category.charAt(0).toUpperCase() + category.slice(1)}</h3>
+          <div class="category-column">
+            ${articles.slice(0, 3).map(article => `
+              <div class="card mb-3">
+                <img src="${article.image || 'https://via.placeholder.com/300'}" class="card-img-top" alt="News Image">
+                <div class="card-body">
+                  <h5 class="card-title">${article.title}</h5>
+                  <p class="card-text">${article.description || 'No description available.'}</p>
+                  <a href="${article.url}" target="_blank" class="btn btn-sm btn-primary">Read More</a>
+                </div>
+              </div>
+            `).join('')}
+          </div>
         </div>
       `;
     }
 
-    categoryNewsContainer.innerHTML = categoryContent || '<p class="text-center text-warning">No news available for the selected categories.</p>';
+    categoryContent += '</div>';
+    categoryNewsContainer.innerHTML = categoryContent || '<p class="text-center text-warning">No news available.</p>';
   }
 
   // ✅ Debounced Search Function
@@ -735,7 +737,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 300);
   }
 
-  // ✅ Fetch News on Page Load with Saved Preferences
+  // ✅ Load News on Page Load
   const savedCountry = localStorage.getItem("selectedCountry") || "us";
   const savedLanguage = localStorage.getItem("selectedLanguage") || "en";
   countrySelector.value = savedCountry;
@@ -744,24 +746,11 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchCarouselNews();
   loadAllCategoriesNews();
 
-  // ✅ Country & Language Selection Listeners
-  countrySelector.addEventListener("change", () => {
-    localStorage.setItem("selectedCountry", countrySelector.value);
-    fetchNews(countrySelector.value, languageSelector.value);
-    fetchCarouselNews();
-  });
-
-  languageSelector.addEventListener("change", () => {
-    localStorage.setItem("selectedLanguage", languageSelector.value);
-    fetchNews(countrySelector.value, languageSelector.value);
-    fetchCarouselNews();
-  });
-
-  // ✅ Search Listeners
+  // ✅ Event Listeners
+  countrySelector.addEventListener("change", () => fetchNews(countrySelector.value, languageSelector.value));
+  languageSelector.addEventListener("change", () => fetchNews(countrySelector.value, languageSelector.value));
   searchButton.addEventListener("click", searchNews);
-  searchInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") searchNews();
-  });
+  searchInput.addEventListener("keydown", (e) => e.key === "Enter" && searchNews());
 });
 
 </script>
