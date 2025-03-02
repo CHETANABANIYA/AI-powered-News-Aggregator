@@ -1,8 +1,8 @@
-import React from 'react';
+ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
-import Carousel from './components/Carousel';
+import NewsCarousel from './components/NewsCarousel'; // ✅ Renamed to avoid conflict
 import NewsCategories from './components/NewsCategories';
 import SubscriptionSection from './components/SubscriptionSection';
 import Footer from './components/Footer';
@@ -12,24 +12,30 @@ import Login from './components/Login';
 function App() {
   return (
     <Router>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={
-          <>
-            <HeroSection />
-            <Carousel />
-            <NewsCategories />
-            <SubscriptionSection />
-            <Footer />
-          </>
-        } />
-        <Route path="/login" element={<Login />} />
-      </Routes>
+      <div> {/* ✅ Wrap everything in a div */}
+        <Navbar />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <div>
+                <HeroSection />
+                <NewsCarousel />
+                <NewsCategories />
+                <SubscriptionSection />
+                <Footer />
+              </div>
+            }
+          />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </div>
     </Router>
   );
 }
 
-export default App; // ✅ Don't forget this!
+export default App;
+
 
 
 
