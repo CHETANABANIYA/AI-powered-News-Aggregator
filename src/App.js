@@ -14,22 +14,16 @@ function App() {
     <Router>
       <Navbar />
       <Routes>
-        <Route path="/" element={
-          <>
-            <HeroSection />
-            <Carousel />
-            <NewsCategories />
-            <SubscriptionSection />
-            <Footer />
-          </>
-        } />
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
       </Routes>
+      <Footer />
     </Router>
   );
 }
 
-export default App; // ✅ Don't forget this!
+export default App;
+
 
 
 
