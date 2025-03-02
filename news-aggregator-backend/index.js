@@ -6,59 +6,70 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ Allowed Frontend Origins
+// Allowed Frontend Origins
 const allowedOrigins = [
-  'http://localhost:3000', 
-  'https://ainewsify-news.netlify.app', 
+  'http://localhost:3000',
+  'https://ainewsify-news.netlify.app',
   'https://ai-news-aggregator-l1bikbomi-chetanabaniyas-projects.vercel.app',
-  'https://ai-powered-news-aggregator-3om085y9l-chetanabaniyas-projects.vercel.app' // ✅ Added your latest Vercel deployment
+  'https://ai-powered-news-aggregator-3om085y9l-chetanabaniyas-projects.vercel.app'
 ];
 
-// ✅ CORS Middleware (Now Fully Handles Preflight Requests)
+// CORS Middleware
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('CORS not allowed for this origin'));
+      console.warn(`❌ CORS blocked: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
     }
   },
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.options('*', cors()); // ✅ Handles CORS preflight requests
+app.use(express.json());
 
-// ✅ API Keys from .env (Ensure they exist)
+// API Keys from .env
 const NEWSAPI_KEY = process.env.NEWSAPI_KEY;
 const GNEWS_API_KEY = process.env.GNEWS_API_KEY;
+
 if (!NEWSAPI_KEY || !GNEWS_API_KEY) {
-  console.error('❌ Missing API Keys: Check your .env file or Vercel/Render environment variables.');
+  console.error('❌ Missing API Keys: Check your .env file or environment variables.');
   process.exit(1);
 }
 
-// ✅ Supported Categories
+// Supported Categories
 const NEWSAPI_CATEGORIES = ['business', 'entertainment', 'general', 'health', 'science', 'sports', 'technology'];
-const GNEWS_TOPICS = { business: 'business', entertainment: 'entertainment', general: 'general', health: 'health', science: 'science', sports: 'sports', technology: 'technology' };
+const GNEWS_TOPICS = {
+  business: 'business',
+  entertainment: 'entertainment',
+  general: 'general',
+  health: 'health',
+  science: 'science',
+  sports: 'sports',
+  technology: 'technology'
+};
 
 const DEFAULT_IMAGE = 'https://via.placeholder.com/150?text=No+Image';
 
-// ✅ Route to Fetch News
+// Route to Fetch News
 app.get('/api/news', async (req, res) => {
   try {
     const category = req.query.category || 'general';
     const country = req.query.country || 'us';
 
     let url;
-    let useGNews = ['in', 'jp', 'ca'].includes(country);
+    const useGNews = ['in', 'jp', 'ca'].includes(country);
 
     if (useGNews) {
       const topic = GNEWS_TOPICS[category] || 'general';
       url = `https://gnews.io/api/v4/top-headlines?token=${GNEWS_API_KEY}&lang=en&max=10&topic=${topic}`;
     } else {
       url = `https://newsapi.org/v2/top-headlines?apiKey=${NEWSAPI_KEY}&pageSize=10&language=en&country=${country}`;
-      if (NEWSAPI_CATEGORIES.includes(category)) url += `&category=${category}`;
-      else {
+      if (NEWSAPI_CATEGORIES.includes(category)) {
+        url += `&category=${category}`;
+      } else {
         const categoryQueries = {
           crypto: 'cryptocurrency',
           stockmarket: 'stock market',
@@ -70,10 +81,10 @@ app.get('/api/news', async (req, res) => {
 
     const response = await axios.get(url);
 
-    // ✅ Fallback to `everything` endpoint if no articles found (only for NewsAPI)
+    // Fallback to 'everything' endpoint if no articles found (only for NewsAPI)
     if (response.data.articles.length === 0 && !useGNews) {
-      url = `https://newsapi.org/v2/everything?q=${category}&language=en&apiKey=${NEWSAPI_KEY}&pageSize=10`;
-      const fallbackResponse = await axios.get(url);
+      const fallbackUrl = `https://newsapi.org/v2/everything?q=${category}&language=en&apiKey=${NEWSAPI_KEY}&pageSize=10`;
+      const fallbackResponse = await axios.get(fallbackUrl);
       response.data.articles = fallbackResponse.data.articles;
     }
 
@@ -93,14 +104,17 @@ app.get('/api/news', async (req, res) => {
   }
 });
 
-// ✅ Global Error Handler
+// Global Error Handler
 app.use((err, req, res, next) => {
   console.error('🔥 Backend Error:', err.message);
   res.status(500).json({ message: err.message || 'Internal Server Error' });
 });
 
-// ✅ Server Listener
-app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+// Server Listener
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+});
+
 
 
 
