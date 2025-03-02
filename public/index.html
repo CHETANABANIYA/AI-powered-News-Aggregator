@@ -417,6 +417,12 @@
 </section>
 
 <script>
+let isFetching = false;
+
+const API_BASE_URL = window.location.hostname === "localhost"
+  ? "http://localhost:5000/api/news"
+  : "https://ai-powered-news-aggregator-backend.onrender.com/api/news";
+  
 document.addEventListener("DOMContentLoaded", () => {
   const newsContainer = document.querySelector("#category-news-container");
   const carouselContainer = document.querySelector("#carousel-news-container");
