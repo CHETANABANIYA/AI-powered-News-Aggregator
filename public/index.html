@@ -583,6 +583,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </html>
 <script>
 let isFetching = false;
+
 const API_BASE_URL = window.location.hostname === "localhost"
   ? "http://localhost:5000/api"
   : "https://ai-powered-news-aggregator-backend.onrender.com/api";
@@ -595,11 +596,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchButton = document.getElementById("searchButton");
   const searchInput = document.getElementById("searchInput");
   const resultsContainer = document.getElementById("searchResults");
+  const categoryNewsContainer = document.getElementById("category-news-container");
 
-  if (!newsContainer || !carouselInner || !countrySelector || !languageSelector || !searchButton || !searchInput || !resultsContainer) {
+  if (!newsContainer || !carouselInner || !countrySelector || !languageSelector || !searchButton || !searchInput || !resultsContainer || !categoryNewsContainer) {
     console.error("❌ Missing one or more required elements in the HTML.");
     return;
   }
+
+  const categories = ['sports', 'entertainment', 'technology', 'business', 'education', 'stockmarket', 'crypto', 'health'];
 
   async function fetchNews(country = "us", language = "en") {
     if (isFetching) return;
@@ -655,6 +659,51 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  async function fetchCategoryNews(category) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/news?category=${category}&country=us&language=en`);
+      if (!response.ok) throw new Error(`Failed to fetch ${category} news`);
+      const data = await response.json();
+      return data.articles || [];
+    } catch (error) {
+      console.error(`❌ Error fetching ${category} news:`, error);
+      return [];
+    }
+  }
+
+  async function loadAllCategoriesNews() {
+    categoryNewsContainer.innerHTML = '<p class="text-center text-info">Loading category news...</p>';
+
+    let categoryContent = '';
+
+    for (const category of categories) {
+      const articles = await fetchCategoryNews(category);
+      if (articles.length === 0) continue;
+
+      categoryContent += `
+        <div class="category-section mb-4">
+            <h3 class="text-primary">${category.charAt(0).toUpperCase() + category.slice(1)} News</h3>
+            <div class="row">
+                ${articles.slice(0, 4).map(article => `
+                    <div class="col-md-3">
+                        <div class="card news-card">
+                            <img src="${article.image || 'https://via.placeholder.com/300'}" class="card-img-top" alt="News Image">
+                            <div class="card-body">
+                                <h5 class="card-title">${article.title}</h5>
+                                <p class="card-text">${article.description || 'No description available.'}</p>
+                                <a href="${article.url}" target="_blank" class="btn btn-primary">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+      `;
+    }
+
+    categoryNewsContainer.innerHTML = categoryContent || '<p class="text-center text-warning">No news available for the selected categories.</p>';
+  }
+
   // ✅ Debounced Search Function
   let searchTimeout;
   async function searchNews() {
@@ -683,7 +732,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (error) {
         resultsContainer.innerHTML = `<p class="text-center text-danger">Error: ${error.message}</p>`;
       }
-    }, 300); // 300ms debounce
+    }, 300);
   }
 
   // ✅ Fetch News on Page Load with Saved Preferences
@@ -693,6 +742,7 @@ document.addEventListener("DOMContentLoaded", () => {
   languageSelector.value = savedLanguage;
   fetchNews(savedCountry, savedLanguage);
   fetchCarouselNews();
+  loadAllCategoriesNews();
 
   // ✅ Country & Language Selection Listeners
   countrySelector.addEventListener("change", () => {
@@ -707,7 +757,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchCarouselNews();
   });
 
-  // ✅ Search Listeners (Button Click & Enter Key)
+  // ✅ Search Listeners
   searchButton.addEventListener("click", searchNews);
   searchInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") searchNews();
