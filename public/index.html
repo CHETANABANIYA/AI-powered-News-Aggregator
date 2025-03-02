@@ -424,10 +424,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const countrySelector = document.querySelector('#country-selector');
     const languageSelector = document.querySelector('#language-selector');
 
-    // ✅ Dynamic API base URL
+    // ✅ Correct API base URL
     const API_BASE_URL = window.location.hostname === "localhost"
-        ? "http://localhost:5000/api"
-        : "https://ai-powered-news-aggregator-backend.onrender.com";
+        ? "http://localhost:5000/api/news"
+        : "https://ai-powered-news-aggregator-backend.onrender.com/api/news"; // 🔥 FIXED: Added `/api/news`
 
     let selectedCountry = localStorage.getItem("selectedCountry") || "us"; // Default country
     let selectedLanguage = localStorage.getItem("selectedLanguage") || "en"; // Default language
@@ -443,10 +443,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const categoryRow = document.createElement('div');
                 categoryRow.classList.add('col-md-4', 'mb-4');
 
-                const apiUrl = `${API_BASE_URL}/news?category=${category}&country=${selectedCountry}&language=${selectedLanguage}`;
+                const apiUrl = `${API_BASE_URL}?category=${category}&country=${selectedCountry}&language=${selectedLanguage}`;
+                console.log(`Fetching category: ${category} -> ${apiUrl}`); // ✅ Debug log
+
                 const response = await fetch(apiUrl);
-                
-                if (!response.ok) throw new Error(`Failed to fetch ${category} news: ${response.statusText}`);
+                if (!response.ok) throw new Error(`Failed to fetch ${category} news: ${response.status} ${response.statusText}`);
 
                 const data = await response.json();
                 if (!data.articles || data.articles.length === 0) throw new Error(`No news found for ${category}`);
@@ -465,7 +466,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             newsContainer.innerHTML = `<p>Error fetching news: ${error.message}</p>`;
-            console.error("Error fetching news:", error);
+            console.error("❌ Error fetching news:", error);
         }
     }
 
@@ -473,8 +474,11 @@ document.addEventListener('DOMContentLoaded', () => {
         carouselContainer.innerHTML = '<p>Loading news...</p>';
 
         try {
-            const response = await fetch(`${API_BASE_URL}/news?category=general&country=${selectedCountry}&language=${selectedLanguage}`);
-            if (!response.ok) throw new Error(`Failed to fetch carousel news: ${response.statusText}`);
+            const apiUrl = `${API_BASE_URL}?category=general&country=${selectedCountry}&language=${selectedLanguage}`;
+            console.log(`Fetching carousel news -> ${apiUrl}`); // ✅ Debug log
+
+            const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error(`Failed to fetch carousel news: ${response.status} ${response.statusText}`);
 
             const data = await response.json();
             carouselContainer.innerHTML = '';
@@ -498,7 +502,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             carouselContainer.innerHTML = `<p>Error loading carousel news: ${error.message}</p>`;
-            console.error('Error fetching carousel news:', error);
+            console.error('❌ Error fetching carousel news:', error);
         }
     }
 
@@ -507,14 +511,14 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchCarouselNews();
     }
 
-    // ✅ Debounce function to avoid excessive API calls
+    // ✅ Debounce API calls to avoid unnecessary requests
     let fetchTimeout;
     function debouncedFetchAllNews() {
         clearTimeout(fetchTimeout);
         fetchTimeout = setTimeout(fetchAllNews, 300);
     }
 
-    // Event Listeners for Country & Language Selection
+    // ✅ Event Listeners
     countrySelector.addEventListener("change", () => {
         selectedCountry = countrySelector.value;
         localStorage.setItem("selectedCountry", selectedCountry);
@@ -527,10 +531,11 @@ document.addEventListener('DOMContentLoaded', () => {
         debouncedFetchAllNews();
     });
 
-    // Fetch news on page load
+    // ✅ Fetch news on page load
     fetchAllNews();
 });
 </script>
+
 
       <!-- Subscription Section -->
   <section class="subscription-section">
