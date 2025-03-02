@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 5000;
 const allowedOrigins = [
   'http://localhost:3000',
   'https://ainewsify-news.netlify.app',
-  'https://ai-powered-news-aggregator.vercel.app',
+  'https://ai-news-aggregator-l1bikbomi-chetanabaniyas-projects.vercel.app',
   'https://ai-powered-news-aggregator-3om085y9l-chetanabaniyas-projects.vercel.app'
 ];
 
