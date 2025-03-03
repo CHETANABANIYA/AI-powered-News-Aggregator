@@ -417,139 +417,190 @@
 </section>
 
 <script>
-let isFetching = false;
+  let isFetching = false;
 
-const API_BASE_URL = window.location.hostname === "localhost"
-  ? "http://localhost:5000/api/news"
-  : "https://ai-powered-news-aggregator-backend.onrender.com/api/news";
-  
-document.addEventListener("DOMContentLoaded", () => {
-  const newsContainer = document.querySelector("#category-news-container");
-  const carouselContainer = document.querySelector("#carousel-news-container");
-  const countrySelector = document.querySelector("#country-selector");
-  const languageSelector = document.querySelector("#language-selector");
+  const API_BASE_URL = window.location.hostname === "localhost"
+    ? "http://localhost:5000/api/news"
+    : "https://ai-powered-news-aggregator-backend.onrender.com/api/news";
 
-  const categories = ['sports', 'entertainment', 'technology', 'business', 'education', 'health', 'stockmarket', 'crypto'];
-  let selectedCountry = localStorage.getItem("selectedCountry") || "us";
-  let selectedLanguage = localStorage.getItem("selectedLanguage") || "en";
+  document.addEventListener("DOMContentLoaded", () => {
+    const newsContainer = document.querySelector("#category-news-container");
+    const carouselContainer = document.querySelector("#carousel-news-container");
+    const countrySelector = document.querySelector("#country-selector");
+    const languageSelector = document.querySelector("#language-selector");
 
-  // Set default values in selectors
-  countrySelector.value = selectedCountry;
-  languageSelector.value = selectedLanguage;
+    const categories = ['sports', 'entertainment', 'technology', 'business', 'education', 'health', 'stockmarket', 'crypto'];
+    let selectedCountry = localStorage.getItem("selectedCountry") || "us";
+    let selectedLanguage = localStorage.getItem("selectedLanguage") || "en";
 
-  async function fetchCategoryNews(category) {
-    try {
-      const apiUrl = `${API_BASE_URL}?category=${category}&country=${selectedCountry}&language=${selectedLanguage}`;
-      console.log(`Fetching ${category} news -> ${apiUrl}`);
+    // Set default values in selectors
+    countrySelector.value = selectedCountry;
+    languageSelector.value = selectedLanguage;
 
-      const response = await fetch(apiUrl);
-      if (!response.ok) throw new Error(`Failed to fetch ${category} news`);
+    async function fetchCategoryNews(category) {
+      try {
+        const apiUrl = `${API_BASE_URL}?category=${category}&country=${selectedCountry}&language=${selectedLanguage}`;
+        console.log(`Fetching ${category} news -> ${apiUrl}`);
 
-      const data = await response.json();
-      return data.articles || [];
-    } catch (error) {
-      console.error(`❌ Error fetching ${category} news:`, error);
-      return [];
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error(`Failed to fetch ${category} news`);
+
+        const data = await response.json();
+        return data.articles || [];
+      } catch (error) {
+        console.error(`❌ Error fetching ${category} news:`, error);
+        return [];
+      }
     }
-  }
 
-  async function fetchNewsByCategory() {
-    newsContainer.innerHTML = '<p class="text-center text-info">Loading category news...</p>';
-    let categoryContent = '<div class="row">';
+    async function fetchNewsByCategory() {
+      newsContainer.innerHTML = '<p class="text-center text-info">Loading category news...</p>';
+      let categoryContent = '<div class="row">';
 
-    for (const category of categories) {
-      const articles = await fetchCategoryNews(category);
-      if (articles.length === 0) continue;
+      for (const category of categories) {
+        const articles = await fetchCategoryNews(category);
+        if (articles.length === 0) continue;
 
-      categoryContent += `
-        <div class="col-md-3">
-          <h3 class="text-primary text-center">${category.charAt(0).toUpperCase() + category.slice(1)}</h3>
-          <div class="category-column">
-            ${articles.slice(0, 3).map(article => `
-              <div class="card mb-3">
-                <img src="${article.image || 'https://via.placeholder.com/300'}" class="card-img-top" alt="News Image">
+        categoryContent += `
+          <div class="col-md-3">
+            <h3 class="text-primary text-center">${category.charAt(0).toUpperCase() + category.slice(1)}</h3>
+            <div class="category-column">
+              ${articles.slice(0, 3).map(article => `
+                <div class="card mb-3">
+                  <img src="${article.image || 'https://via.placeholder.com/300'}" class="card-img-top" alt="News Image">
+                  <div class="card-body">
+                    <h5 class="card-title">${article.title}</h5>
+                    <p class="card-text">${article.description || 'No description available.'}</p>
+                    <a href="${article.url}" target="_blank" class="btn btn-sm btn-primary">Read More</a>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      categoryContent += '</div>';
+      newsContainer.innerHTML = categoryContent || '<p class="text-center text-warning">No news available.</p>';
+    }
+
+    async function fetchCarouselNews() {
+      carouselContainer.innerHTML = '<p>Loading news...</p>';
+
+      try {
+        const apiUrl = `${API_BASE_URL}?category=general&country=${selectedCountry}&language=${selectedLanguage}`;
+        console.log(`Fetching carousel news -> ${apiUrl}`);
+
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error(`Failed to fetch carousel news`);
+
+        const data = await response.json();
+        carouselContainer.innerHTML = '';
+
+        if (data.articles && data.articles.length > 0) {
+          data.articles.slice(0, 5).forEach((article, index) => {
+            const isActive = index === 0 ? 'active' : '';
+            const carouselItemHTML = `
+              <div class="carousel-item ${isActive}">
+                <img src="${article.image || 'default-news.jpg'}" class="d-block w-100" alt="${article.title || 'News Image'}">
+                <div class="carousel-caption d-none d-md-block">
+                  <h5>${article.title}</h5>
+                  <p>${article.description || 'No description available'}</p>
+                  <a href="${article.url}" target="_blank" class="btn btn-primary">Read More</a>
+                </div>
+              </div>`;
+            carouselContainer.insertAdjacentHTML('beforeend', carouselItemHTML);
+          });
+        } else {
+          carouselContainer.innerHTML = '<p>No news available for the carousel.</p>';
+        }
+      } catch (error) {
+        carouselContainer.innerHTML = `<p>Error loading carousel news: ${error.message}</p>`;
+        console.error('❌ Error fetching carousel news:', error);
+      }
+    }
+
+    async function fetchNewsByCountry() {
+      newsContainer.innerHTML = '<p>Loading news...</p>'; // Show loading state
+
+      try {
+        newsContainer.innerHTML = ''; // Clear previous news
+
+        for (const category of categories) {
+          const categoryRow = document.createElement('div');
+          categoryRow.classList.add('col-md-4', 'mb-4');
+
+          // ✅ API Endpoint with Country Parameter
+          const apiUrl = `${API_BASE_URL}?category=${category}&country=${selectedCountry}`;
+          console.log(`Fetching news for ${category} -> ${apiUrl}`);
+
+          const response = await fetch(apiUrl);
+          if (!response.ok) throw new Error(`Failed to fetch ${category} news`);
+
+          const data = await response.json();
+
+          if (data.articles && data.articles.length > 0) {
+            const categoryHTML = `
+              <div class="card news-card">
+                <img src="${data.articles[0].image || 'https://via.placeholder.com/300x200'}" alt="${category}" class="card-img-top">
                 <div class="card-body">
-                  <h5 class="card-title">${article.title}</h5>
-                  <p class="card-text">${article.description || 'No description available.'}</p>
-                  <a href="${article.url}" target="_blank" class="btn btn-sm btn-primary">Read More</a>
+                  <h5 class="news-card-title">${category.charAt(0).toUpperCase() + category.slice(1)}</h5>
+                  <ul class="news-list">
+                    ${data.articles.slice(0, 3).map(article => `
+                      <li>
+                        <h6>${article.title}</h6>
+                        <p>${article.description || 'No description available'}</p>
+                        <a href="${article.url}" target="_blank" class="btn btn-primary">Read More</a>
+                      </li>
+                    `).join('')}
+                  </ul>
                 </div>
               </div>
-            `).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    categoryContent += '</div>';
-    newsContainer.innerHTML = categoryContent || '<p class="text-center text-warning">No news available.</p>';
-  }
-
-  async function fetchCarouselNews() {
-    carouselContainer.innerHTML = '<p>Loading news...</p>';
-
-    try {
-      const apiUrl = `${API_BASE_URL}?category=general&country=${selectedCountry}&language=${selectedLanguage}`;
-      console.log(`Fetching carousel news -> ${apiUrl}`);
-
-      const response = await fetch(apiUrl);
-      if (!response.ok) throw new Error(`Failed to fetch carousel news`);
-
-      const data = await response.json();
-      carouselContainer.innerHTML = '';
-
-      if (data.articles && data.articles.length > 0) {
-        data.articles.slice(0, 5).forEach((article, index) => {
-          const isActive = index === 0 ? 'active' : '';
-          const carouselItemHTML = `
-            <div class="carousel-item ${isActive}">
-              <img src="${article.image || 'default-news.jpg'}" class="d-block w-100" alt="${article.title || 'News Image'}">
-              <div class="carousel-caption d-none d-md-block">
-                <h5>${article.title}</h5>
-                <p>${article.description || 'No description available'}</p>
-                <a href="${article.url}" target="_blank" class="btn btn-primary">Read More</a>
-              </div>
-            </div>`;
-          carouselContainer.insertAdjacentHTML('beforeend', carouselItemHTML);
-        });
-      } else {
-        carouselContainer.innerHTML = '<p>No news available for the carousel.</p>';
+            `;
+            categoryRow.innerHTML = categoryHTML;
+            newsContainer.appendChild(categoryRow);
+          } else {
+            categoryRow.innerHTML = `<p>No news available in ${category}.</p>`;
+            newsContainer.appendChild(categoryRow);
+          }
+        }
+      } catch (error) {
+        console.error('❌ Error fetching news:', error);
+        newsContainer.innerHTML = '<p>Error loading news.</p>';
       }
-    } catch (error) {
-      carouselContainer.innerHTML = `<p>Error loading carousel news: ${error.message}</p>`;
-      console.error('❌ Error fetching carousel news:', error);
     }
-  }
 
-  function fetchAllNews() {
-    fetchNewsByCategory();
-    fetchCarouselNews();
-  }
+    function fetchAllNews() {
+      fetchNewsByCategory();
+      fetchCarouselNews();
+      fetchNewsByCountry();
+    }
 
-  // ✅ Debounce API calls to avoid unnecessary requests
-  let fetchTimeout;
-  function debouncedFetchAllNews() {
-    clearTimeout(fetchTimeout);
-    fetchTimeout = setTimeout(fetchAllNews, 300);
-  }
+    // ✅ Debounce API calls to avoid unnecessary requests
+    let fetchTimeout;
+    function debouncedFetchAllNews() {
+      clearTimeout(fetchTimeout);
+      fetchTimeout = setTimeout(fetchAllNews, 300);
+    }
 
-  // ✅ Event Listeners
-  countrySelector.addEventListener("change", () => {
-    selectedCountry = countrySelector.value;
-    localStorage.setItem("selectedCountry", selectedCountry);
-    debouncedFetchAllNews();
+    // ✅ Event Listeners
+    countrySelector.addEventListener("change", () => {
+      selectedCountry = countrySelector.value;
+      localStorage.setItem("selectedCountry", selectedCountry);
+      debouncedFetchAllNews();
+    });
+
+    languageSelector.addEventListener("change", () => {
+      selectedLanguage = languageSelector.value;
+      localStorage.setItem("selectedLanguage", selectedLanguage);
+      debouncedFetchAllNews();
+    });
+
+    // ✅ Fetch news on page load
+    fetchAllNews();
   });
-
-  languageSelector.addEventListener("change", () => {
-    selectedLanguage = languageSelector.value;
-    localStorage.setItem("selectedLanguage", selectedLanguage);
-    debouncedFetchAllNews();
-  });
-
-  // ✅ Fetch news on page load
-  fetchAllNews();
-});
-
 </script>
+
 
 
       <!-- Subscription Section -->
