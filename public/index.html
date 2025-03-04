@@ -453,22 +453,23 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function fetchNewsByCategory() {
-    newsContainer.innerHTML = '<h2 class="text-center my-4">Explore News by Category</h2>';
-    let categoryContent = '<div class="container ai-news-section">';
+    newsContainer.innerHTML = '<h2 class="text-center my-4 neon-text">Explore News by Category</h2>';
+    let categoryContent = '<div class="category-grid">';
 
-    for (const category of categories) {
+    for (let category of categories) {
       const articles = await fetchCategoryNews(category);
+      
       categoryContent += `
-        <div class="ai-category-card">
-          <h3 class="ai-category-title">${category.charAt(0).toUpperCase() + category.slice(1)}</h3>
-          <div class="ai-news-grid">
-            ${articles.slice(0, 4).map(article => `
-              <div class="ai-news-card">
-                <img src="${article.image || 'https://via.placeholder.com/300'}" class="ai-news-img" alt="News Image">
-                <div class="ai-news-content">
-                  <h5 class="ai-news-title">${article.title}</h5>
-                  <p class="ai-news-text">${article.description || 'No description available.'}</p>
-                  <a href="${article.url}" target="_blank" class="ai-news-btn">Read More</a>
+        <div class="category-card glassmorphism">
+          <h3 class="category-title">${category.charAt(0).toUpperCase() + category.slice(1)}</h3>
+          <div class="category-news-list">
+            ${articles.slice(0, 3).map(article => `
+              <div class="news-item">
+                <img src="${article.image || 'https://via.placeholder.com/300'}" class="news-image" alt="News Image">
+                <div class="news-info">
+                  <h5 class="news-title">${article.title}</h5>
+                  <p class="news-description">${article.description || 'No description available.'}</p>
+                  <a href="${article.url}" target="_blank" class="news-btn">Read More</a>
                 </div>
               </div>
             `).join('')}
@@ -477,6 +478,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     }
     categoryContent += '</div>';
+
     newsContainer.innerHTML = categoryContent;
   }
 
@@ -542,6 +544,61 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchAllNews();
 });
 </script>
+
+<style>
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+  .category-card {
+    padding: 20px;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease-in-out;
+  }
+  .category-card:hover {
+    transform: scale(1.05);
+  }
+  .news-item {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+  }
+  .news-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+  }
+  .news-info {
+    flex: 1;
+  }
+  .news-title {
+    font-size: 1rem;
+    font-weight: bold;
+  }
+  .news-description {
+    font-size: 0.9rem;
+    color: #ccc;
+  }
+  .news-btn {
+    display: inline-block;
+    padding: 5px 10px;
+    background: #007bff;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: 0.3s;
+  }
+  .news-btn:hover {
+    background: #0056b3;
+  }
+</style>
+
 
 
 
