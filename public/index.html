@@ -464,8 +464,8 @@ document.addEventListener("DOMContentLoaded", () => {
           <h3 class="category-title">${category.charAt(0).toUpperCase() + category.slice(1)}</h3>
           <div class="category-news-list">
             ${articles.slice(0, 3).map(article => `
-              <div class="news-item">
-                <img src="${article.image || 'https://via.placeholder.com/300'}" class="news-image hover-zoom" alt="News Image">
+              <div class="news-item hover-zoom">
+                <img src="${article.image || 'https://via.placeholder.com/300'}" class="news-image" alt="News Image">
                 <div class="news-info">
                   <h5 class="news-title">${article.title}</h5>
                   <p class="news-description">${article.description || 'No description available.'}</p>
@@ -499,10 +499,10 @@ document.addEventListener("DOMContentLoaded", () => {
         data.articles.slice(0, 5).forEach((article, index) => {
           const isActive = index === 0 ? 'active' : '';
           const carouselItemHTML = `
-            <div class="carousel-item ${isActive} fade-slide">
-              <div class="overlay"></div>
-              <img src="${article.image || 'default-news.jpg'}" class="d-block w-100 rounded" alt="${article.title || 'News Image'}">
-              <div class="carousel-caption d-md-block custom-carousel-caption">
+            <div class="carousel-item ${isActive}">
+              <div class="carousel-overlay"></div>
+              <img src="${article.image || 'default-news.jpg'}" class="d-block w-100 rounded carousel-img" alt="${article.title || 'News Image'}">
+              <div class="carousel-caption d-md-block glass-overlay">
                 <h5 class="carousel-title">${article.title}</h5>
                 <p class="carousel-description">${article.description || 'No description available'}</p>
                 <a href="${article.url}" target="_blank" class="btn btn-gradient">Read More</a>
@@ -545,6 +545,7 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchAllNews();
 });
 </script>
+
 
 <style>
   .fade-slide {
