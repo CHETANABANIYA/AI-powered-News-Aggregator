@@ -438,12 +438,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function fetchCategoryNews(category) {
     try {
-      const apiUrl = `${API_BASE_URL}?category=${category}&country=${selectedCountry}&language=${selectedLanguage}`;
-      console.log(`Fetching ${category} news -> ${apiUrl}`);
-
-      const response = await fetch(apiUrl);
+      const response = await fetch(`${API_BASE_URL}?category=${category}&country=us&language=en`);
       if (!response.ok) throw new Error(`Failed to fetch ${category} news`);
-
       const data = await response.json();
       return data.articles || [];
     } catch (error) {
@@ -452,8 +448,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  async function fetchNewsByCategory() {
-    newsContainer.innerHTML = '<h2 class="text-center my-4">Explore News by Category</h2>';
+  async function loadAllCategoriesNews() {
+    categoryNewsContainer.innerHTML = '<h2 class="text-center my-4 text-uppercase font-weight-bold">Explore News by Category</h2>';
     let categoryContent = '<div class="container">';
 
     for (let i = 0; i < categories.length; i += 2) {
@@ -461,19 +457,21 @@ document.addEventListener("DOMContentLoaded", () => {
       for (let j = 0; j < 2 && i + j < categories.length; j++) {
         const category = categories[i + j];
         const articles = await fetchCategoryNews(category);
-        
+
         categoryContent += `
           <div class="col-md-6 mb-4">
-            <div class="card shadow-lg p-3">
-              <h3 class="text-primary text-center">${category.charAt(0).toUpperCase() + category.slice(1)}</h3>
-              <div class="category-column">
+            <div class="card shadow-lg p-3 border-0" style="border-radius: 15px; overflow: hidden;">
+              <div class="card-header bg-dark text-white text-center py-2" style="border-radius: 10px;">
+                <h4 class="m-0">${category.charAt(0).toUpperCase() + category.slice(1)}</h4>
+              </div>
+              <div class="card-body bg-light">
                 ${articles.slice(0, 3).map(article => `
-                  <div class="card mb-3">
-                    <img src="${article.image || 'https://via.placeholder.com/300'}" class="card-img-top" alt="News Image">
+                  <div class="card mb-3 border-0 shadow-sm" style="border-radius: 10px;">
+                    <img src="${article.image || 'https://via.placeholder.com/300'}" class="card-img-top" style="border-top-left-radius: 10px; border-top-right-radius: 10px;" alt="News Image">
                     <div class="card-body">
                       <h5 class="card-title">${article.title}</h5>
-                      <p class="card-text">${article.description || 'No description available.'}</p>
-                      <a href="${article.url}" target="_blank" class="btn btn-sm btn-primary">Read More</a>
+                      <p class="card-text text-muted">${article.description || 'No description available.'}</p>
+                      <a href="${article.url}" target="_blank" class="btn btn-sm btn-dark">Read More</a>
                     </div>
                   </div>
                 `).join('')}
@@ -486,7 +484,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     categoryContent += '</div>';
 
-    newsContainer.innerHTML = categoryContent;
+    categoryNewsContainer.innerHTML = categoryContent;
   }
 
   async function fetchCarouselNews() {
