@@ -478,6 +478,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     }
     categoryContent += '</div>';
+
     newsContainer.innerHTML = categoryContent;
   }
 
@@ -499,11 +500,11 @@ document.addEventListener("DOMContentLoaded", () => {
           const isActive = index === 0 ? 'active' : '';
           const carouselItemHTML = `
             <div class="carousel-item ${isActive}">
-              <img src="${article.image || 'default-news.jpg'}" class="d-block w-100" alt="${article.title || 'News Image'}">
-              <div class="carousel-caption d-none d-md-block">
-                <h5>${article.title}</h5>
+              <img src="${article.image || 'default-news.jpg'}" class="d-block w-100 carousel-img" alt="${article.title || 'News Image'}">
+              <div class="carousel-caption d-none d-md-block glass-overlay">
+                <h5 class="neon-glow">${article.title}</h5>
                 <p>${article.description || 'No description available'}</p>
-                <a href="${article.url}" target="_blank" class="btn btn-primary">Read More</a>
+                <a href="${article.url}" target="_blank" class="btn btn-primary hover-zoom">Read More</a>
               </div>
             </div>`;
           carouselContainer.insertAdjacentHTML('beforeend', carouselItemHTML);
@@ -596,6 +597,28 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   .news-btn:hover {
     background: #0056b3;
+  }
+  .carousel-img {
+    filter: brightness(80%) contrast(110%);
+    transition: transform 0.5s ease-in-out;
+  }
+  .carousel-item:hover .carousel-img {
+    transform: scale(1.05);
+  }
+  .glass-overlay {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    padding: 15px;
+    border-radius: 10px;
+  }
+  .neon-glow {
+    text-shadow: 0 0 8px cyan, 0 0 15px blue;
+  }
+  .hover-zoom {
+    transition: transform 0.3s ease-in-out;
+  }
+  .hover-zoom:hover {
+    transform: scale(1.1);
   }
 </style>
 
