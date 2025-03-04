@@ -500,11 +500,11 @@ document.addEventListener("DOMContentLoaded", () => {
           const isActive = index === 0 ? 'active' : '';
           const carouselItemHTML = `
             <div class="carousel-item ${isActive}">
-              <img src="${article.image || 'default-news.jpg'}" class="d-block w-100 carousel-img" alt="${article.title || 'News Image'}">
-              <div class="carousel-caption d-none d-md-block glass-overlay">
-                <h5 class="neon-glow">${article.title}</h5>
-                <p>${article.description || 'No description available'}</p>
-                <a href="${article.url}" target="_blank" class="btn btn-primary hover-zoom">Read More</a>
+              <img src="${article.image || 'default-news.jpg'}" class="d-block w-100 rounded" alt="${article.title || 'News Image'}">
+              <div class="carousel-caption d-md-block custom-carousel-caption">
+                <h5 class="carousel-title">${article.title}</h5>
+                <p class="carousel-description">${article.description || 'No description available'}</p>
+                <a href="${article.url}" target="_blank" class="btn btn-gradient">Read More</a>
               </div>
             </div>`;
           carouselContainer.insertAdjacentHTML('beforeend', carouselItemHTML);
@@ -544,6 +544,7 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchAllNews();
 });
 </script>
+
 
 
 <style>
