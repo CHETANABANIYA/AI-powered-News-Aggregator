@@ -387,10 +387,15 @@
 <section class="hero-section">
   <h1>AI-Powered News Aggregator</h1>
   <p>Your one-stop platform for curated, real-time news updates.</p>
+  
   <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Search for news...">
-    <button type="button" id="searchButton">Search</button>
-  </div>
+  <input type="text" id="searchInput" placeholder="Search for news...">
+  <button type="button" id="searchButton">Search</button>
+</div>
+
+<!-- Search results container -->
+<div id="searchResults"></div>
+
 </section>
 <!-- Results Container -->
 <div id="searchResults"></div>
@@ -543,6 +548,60 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchAllNews();
 });
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const searchButton = document.getElementById("searchButton");
+  const searchInput = document.getElementById("searchInput");
+  const resultsContainer = document.getElementById("searchResults"); // Make sure this div exists in your HTML
+
+  if (!searchButton || !searchInput || !resultsContainer) {
+    console.error("❌ Search elements are missing in the HTML.");
+    return;
+  }
+
+  async function searchNews() {
+    const query = searchInput.value.trim();
+    if (!query) {
+      alert("Please enter a search term!");
+      return;
+    }
+
+    resultsContainer.innerHTML = '<p class="text-center text-info">Searching...</p>';
+
+    try {
+      const apiUrl = `${API_BASE_URL}/search?query=${encodeURIComponent(query)}`;
+      console.log(`Fetching search results -> ${apiUrl}`);
+
+      const response = await fetch(apiUrl);
+      if (!response.ok) throw new Error(`Failed to fetch search results`);
+
+      const data = await response.json();
+
+      resultsContainer.innerHTML = data.articles?.length
+        ? data.articles.map(article => `
+          <div class="news-card">
+            <img src="${article.image || 'https://via.placeholder.com/300'}" class="news-image">
+            <div class="news-content">
+              <h3><a href="${article.url}" target="_blank">${article.title}</a></h3>
+              <p>${article.description || "No description available."}</p>
+              <p class="news-meta"><strong>Source:</strong> ${article.source?.name || 'Unknown'} | 
+              <strong>Published:</strong> ${new Date(article.publishedAt).toLocaleString()}</p>
+            </div>
+          </div>`).join("")
+        : "<p class='text-warning'>No results found.</p>";
+    } catch (error) {
+      resultsContainer.innerHTML = `<p class="text-center text-danger">Error: ${error.message}</p>`;
+      console.error("❌ Search error:", error);
+    }
+  }
+
+  searchButton.addEventListener("click", searchNews);
+  searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") searchNews();
+  });
+});
+
+</script>
 
 
 
@@ -578,7 +637,7 @@ document.addEventListener("DOMContentLoaded", () => {
   .hover-zoom:hover {
     transform: scale(1.1);
   }
-  <style>
+
   .category-row {
     margin-bottom: 30px;
   }
@@ -627,7 +686,7 @@ document.addEventListener("DOMContentLoaded", () => {
     background: #0056b3;
   }
 </style>
-</style>
+
 
 
 
