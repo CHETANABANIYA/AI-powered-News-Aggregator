@@ -454,32 +454,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function fetchNewsByCategory() {
     newsContainer.innerHTML = '<h2 class="text-center my-4 neon-text">Explore News by Category</h2>';
-    let categoryContent = '<div class="category-grid">';
 
     for (let category of categories) {
       const articles = await fetchCategoryNews(category);
-      
-      categoryContent += `
-        <div class="category-card glassmorphism">
+      let categoryContent = `
+        <div class="category-row">
           <h3 class="category-title">${category.charAt(0).toUpperCase() + category.slice(1)}</h3>
-          <div class="category-news-list">
-            ${articles.slice(0, 3).map(article => `
-              <div class="news-item hover-zoom">
-                <img src="${article.image || 'https://via.placeholder.com/300'}" class="news-image" alt="News Image">
-                <div class="news-info">
-                  <h5 class="news-title">${article.title}</h5>
-                  <p class="news-description">${article.description || 'No description available.'}</p>
-                  <a href="${article.url}" target="_blank" class="news-btn">Read More</a>
-                </div>
-              </div>
-            `).join('')}
+          <div class="category-news-list">`;
+
+      categoryContent += articles.slice(0, 4).map(article => `
+        <div class="news-item">
+          <img src="${article.image || 'https://via.placeholder.com/300'}" class="news-image" alt="News Image">
+          <div class="news-info">
+            <h5 class="news-title">${article.title}</h5>
+            <p class="news-description">${article.description || 'No description available.'}</p>
+            <a href="${article.url}" target="_blank" class="news-btn">Read More</a>
           </div>
         </div>
-      `;
-    }
-    categoryContent += '</div>';
+      `).join('');
 
-    newsContainer.innerHTML = categoryContent;
+      categoryContent += '</div></div>';
+      newsContainer.innerHTML += categoryContent;
+    }
   }
 
   async function fetchCarouselNews() {
@@ -500,9 +496,8 @@ document.addEventListener("DOMContentLoaded", () => {
           const isActive = index === 0 ? 'active' : '';
           const carouselItemHTML = `
             <div class="carousel-item ${isActive}">
-              <div class="carousel-overlay"></div>
-              <img src="${article.image || 'default-news.jpg'}" class="d-block w-100 rounded carousel-img" alt="${article.title || 'News Image'}">
-              <div class="carousel-caption d-md-block glass-overlay">
+              <img src="${article.image || 'default-news.jpg'}" class="d-block w-100 rounded" alt="${article.title || 'News Image'}">
+              <div class="carousel-caption d-md-block custom-carousel-caption">
                 <h5 class="carousel-title">${article.title}</h5>
                 <p class="carousel-description">${article.description || 'No description available'}</p>
                 <a href="${article.url}" target="_blank" class="btn btn-gradient">Read More</a>
@@ -579,6 +574,55 @@ document.addEventListener("DOMContentLoaded", () => {
   .hover-zoom:hover {
     transform: scale(1.1);
   }
+  <style>
+  .category-row {
+    margin-bottom: 30px;
+  }
+  .category-news-list {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+  }
+  .news-item {
+    flex: 0 0 300px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s;
+  }
+  .news-item:hover {
+    transform: scale(1.05);
+  }
+  .news-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+  }
+  .news-info {
+    padding: 10px;
+  }
+  .news-title {
+    font-size: 1rem;
+    font-weight: bold;
+  }
+  .news-description {
+    font-size: 0.9rem;
+    color: #555;
+  }
+  .news-btn {
+    display: inline-block;
+    padding: 5px 10px;
+    background: #007bff;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: 0.3s;
+  }
+  .news-btn:hover {
+    background: #0056b3;
+  }
+</style>
 </style>
 
 
