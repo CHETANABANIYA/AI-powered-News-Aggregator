@@ -454,28 +454,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function fetchNewsByCategory() {
     newsContainer.innerHTML = '<h2 class="text-center my-4 neon-text">Explore News by Category</h2>';
+    let categoryContent = '';
 
     for (let category of categories) {
       const articles = await fetchCategoryNews(category);
-      let categoryContent = `
+      
+      categoryContent += `
         <div class="category-row">
           <h3 class="category-title">${category.charAt(0).toUpperCase() + category.slice(1)}</h3>
-          <div class="category-news-list">`;
-
-      categoryContent += articles.slice(0, 4).map(article => `
-        <div class="news-item">
-          <img src="${article.image || 'https://via.placeholder.com/300'}" class="news-image" alt="News Image">
-          <div class="news-info">
-            <h5 class="news-title">${article.title}</h5>
-            <p class="news-description">${article.description || 'No description available.'}</p>
-            <a href="${article.url}" target="_blank" class="news-btn">Read More</a>
+          <div class="category-news-list modern-grid">
+            ${articles.slice(0, 4).map(article => `
+              <div class="news-card glassmorphism hover-effect">
+                <img src="${article.image || 'https://via.placeholder.com/300'}" class="news-image" alt="News Image">
+                <div class="news-info">
+                  <h5 class="news-title">${article.title}</h5>
+                  <p class="news-description">${article.description || 'No description available.'}</p>
+                  <a href="${article.url}" target="_blank" class="news-btn">Read More</a>
+                </div>
+              </div>
+            `).join('')}
           </div>
         </div>
-      `).join('');
-
-      categoryContent += '</div></div>';
-      newsContainer.innerHTML += categoryContent;
+      `;
     }
+
+    newsContainer.innerHTML = categoryContent;
   }
 
   async function fetchCarouselNews() {
@@ -540,6 +543,7 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchAllNews();
 });
 </script>
+
 
 
 <style>
