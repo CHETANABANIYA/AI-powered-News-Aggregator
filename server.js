@@ -11,13 +11,14 @@ const PORT = process.env.PORT || 5000;
 // API Keys
 const NEWS_API_KEY = process.env.NEWS_API_KEY || 'c8f7bbd1aa7b4719ae619139984f2b08';
 const GNEWS_API_KEY = process.env.GNEWS_API_KEY || '10998e49626e56d8e92a5a9470f0d169';
-const REDIS_URL = process.env.REDIS_URL || "redis://default:AWr_AAIjcDFkYWI2MWQ2MTA1OTQ0NWE4YTFjYTVmN2FhMDVhM2UzZXAxMA@closing-mantis-27391.upstash.io:6379"
+const REDIS_URL = process.env.REDIS_URL || "redis://default:AWr_AAIjcDFkYWI2MWQ2MTA1OTQ0NWE4YTFjYTVmN2FhMDVhM2UzZXAxMA@closing-mantis-27391.upstash.io:6379";
 
 // Enable CORS
 const allowedOrigins = [
   'http://localhost:3000',
   'https://ai-powered-news-aggregator.vercel.app'
 ];
+
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -118,7 +119,41 @@ app.get('/api/news', async (req, res) => {
   }
 });
 
+// ✅ SEARCH NEWS ROUTE (NEWLY ADDED)
+app.get('/api/news/search', async (req, res) => {
+  const query = req.query.query;
+  if (!query) {
+    return res.status(400).json({ error: 'Missing query parameter' });
+  }
+
+  const newsAPIUrl = `https://newsapi.org/v2/everything?q=${query}&language=en&apiKey=${NEWS_API_KEY}`;
+  const gnewsAPIUrl = `https://gnews.io/api/v4/search?q=${query}&lang=en&apikey=${GNEWS_API_KEY}`;
+
+  try {
+    const newsAPIResponse = await axios.get(newsAPIUrl);
+    if (newsAPIResponse.data?.articles?.length > 0) {
+      return res.json(newsAPIResponse.data);
+    }
+    console.warn('⚠️ NewsAPI search returned no results. Trying GNews...');
+  } catch (error) {
+    console.error('❌ NewsAPI Search Error:', error.response?.data || error.message);
+  }
+
+  try {
+    const gnewsResponse = await axios.get(gnewsAPIUrl);
+    if (gnewsResponse.data?.articles?.length > 0) {
+      return res.json(gnewsResponse.data);
+    }
+    console.warn('⚠️ GNews search also returned no results.');
+  } catch (error) {
+    console.error('❌ GNews Search Error:', error.response?.data || error.message);
+  }
+
+  res.json({ articles: [] }); // Return empty if no results found
+});
+
 // Start Server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
