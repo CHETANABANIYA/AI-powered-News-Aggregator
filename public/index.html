@@ -420,7 +420,6 @@
     </div> <!-- ✅ Closing div for #category-news-container -->
   </div>
 </section>
-
 <script>
 let isFetching = false;
 
@@ -433,6 +432,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const carouselContainer = document.querySelector("#carousel-news-container");
   const countrySelector = document.querySelector("#country-selector");
   const languageSelector = document.querySelector("#language-selector");
+  const searchButton = document.getElementById("searchButton");
+  const searchInput = document.getElementById("searchInput");
+  const resultsContainer = document.getElementById("searchResults");
 
   const categories = ['sports', 'entertainment', 'technology', 'business', 'health', 'stockmarket'];
   let selectedCountry = localStorage.getItem("selectedCountry") || "us";
@@ -522,43 +524,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function fetchAllNews() {
-    fetchNewsByCategory();
-    fetchCarouselNews();
-  }
-
-  let fetchTimeout;
-  function debouncedFetchAllNews() {
-    clearTimeout(fetchTimeout);
-    fetchTimeout = setTimeout(fetchAllNews, 300);
-  }
-
-  countrySelector.addEventListener("change", () => {
-    selectedCountry = countrySelector.value;
-    localStorage.setItem("selectedCountry", selectedCountry);
-    debouncedFetchAllNews();
-  });
-
-  languageSelector.addEventListener("change", () => {
-    selectedLanguage = languageSelector.value;
-    localStorage.setItem("selectedLanguage", selectedLanguage);
-    debouncedFetchAllNews();
-  });
-
-  fetchAllNews();
-});
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const searchButton = document.getElementById("searchButton");
-  const searchInput = document.getElementById("searchInput");
-  const resultsContainer = document.getElementById("searchResults"); // Make sure this div exists in your HTML
-
-  if (!searchButton || !searchInput || !resultsContainer) {
-    console.error("❌ Search elements are missing in the HTML.");
-    return;
-  }
-
   async function searchNews() {
     const query = searchInput.value.trim();
     if (!query) {
@@ -595,14 +560,38 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function fetchAllNews() {
+    fetchNewsByCategory();
+    fetchCarouselNews();
+  }
+
+  let fetchTimeout;
+  function debouncedFetchAllNews() {
+    clearTimeout(fetchTimeout);
+    fetchTimeout = setTimeout(fetchAllNews, 300);
+  }
+
+  countrySelector.addEventListener("change", () => {
+    selectedCountry = countrySelector.value;
+    localStorage.setItem("selectedCountry", selectedCountry);
+    debouncedFetchAllNews();
+  });
+
+  languageSelector.addEventListener("change", () => {
+    selectedLanguage = languageSelector.value;
+    localStorage.setItem("selectedLanguage", selectedLanguage);
+    debouncedFetchAllNews();
+  });
+
   searchButton.addEventListener("click", searchNews);
   searchInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") searchNews();
   });
+
+  fetchAllNews();
 });
 
 </script>
-
 
 
 <style>
