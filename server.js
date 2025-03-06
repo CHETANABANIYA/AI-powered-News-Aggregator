@@ -4,6 +4,7 @@ const axios = require('axios');
 const cors = require('cors');
 const redis = require('redis');
 const rateLimit = require('express-rate-limit');
+const mailchimp = require("@mailchimp/mailchimp_marketing");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -11,7 +12,15 @@ const PORT = process.env.PORT || 5000;
 // API Keys
 const NEWS_API_KEY = process.env.NEWS_API_KEY || 'c8f7bbd1aa7b4719ae619139984f2b08';
 const GNEWS_API_KEY = process.env.GNEWS_API_KEY || '10998e49626e56d8e92a5a9470f0d169';
+const MAILCHIMP_API_KEY = process.env.MAILCHIMP_API_KEY || "1b7aa6e1ad559385ac874c0074c37f9a-us11";
+const MAILCHIMP_LIST_ID = process.env.MAILCHIMP_LIST_ID || "6918a248d2"; // Replace with your Audience ID
 const REDIS_URL = process.env.REDIS_URL || "redis://default:AWr_AAIjcDFkYWI2MWQ2MTA1OTQ0NWE4YTFjYTVmN2FhMDVhM2UzZXAxMA@closing-mantis-27391.upstash.io:6379";
+
+// Mailchimp Config
+mailchimp.setConfig({
+  apiKey: MAILCHIMP_API_KEY,
+  server: "us11", // Change based on your Mailchimp API key prefix
+});
 
 // Enable CORS
 const allowedOrigins = [
@@ -28,7 +37,7 @@ app.use(cors({
       callback(new Error('Not allowed by CORS'));
     }
   },
-  methods: ['GET'],
+  methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type']
 }));
 
@@ -119,7 +128,7 @@ app.get('/api/news', async (req, res) => {
   }
 });
 
-// ✅ SEARCH NEWS ROUTE (UPDATED)
+// ✅ SEARCH NEWS ROUTE
 app.get('/api/news/search', async (req, res) => {
   const query = req.query.query;
   if (!query) {
@@ -153,9 +162,32 @@ app.get('/api/news/search', async (req, res) => {
   res.json(results);
 });
 
+// ✅ MAILCHIMP SUBSCRIPTION ROUTE
+app.post("/api/subscribe", async (req, res) => {
+  const { email } = req.body;
+
+  if (!email || !email.includes("@")) {
+    return res.status(400).json({ error: "Invalid email address" });
+  }
+
+  try {
+    await mailchimp.lists.addListMember(MAILCHIMP_LIST_ID, {
+      email_address: email,
+      status: "subscribed",
+    });
+
+    console.log("✅ Subscription successful:", email);
+    res.json({ message: "Successfully subscribed!" });
+  } catch (error) {
+    console.error("❌ Mailchimp Error:", error.response?.text || error.message);
+    res.status(500).json({ error: "Subscription failed. Try again later." });
+  }
+});
+
 // Start Server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
 
 
