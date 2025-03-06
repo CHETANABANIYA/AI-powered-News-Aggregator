@@ -119,43 +119,45 @@ app.get('/api/news', async (req, res) => {
   }
 });
 
-// ✅ SEARCH NEWS ROUTE (NEWLY ADDED)
+// ✅ SEARCH NEWS ROUTE (UPDATED)
 app.get('/api/news/search', async (req, res) => {
   const query = req.query.query;
   if (!query) {
     return res.status(400).json({ error: 'Missing query parameter' });
   }
 
-  const newsAPIUrl = `https://newsapi.org/v2/everything?q=${query}&language=en&apiKey=${NEWS_API_KEY}`;
-  const gnewsAPIUrl = `https://gnews.io/api/v4/search?q=${query}&lang=en&apikey=${GNEWS_API_KEY}`;
+  let results = { articles: [] };
 
   try {
-    const newsAPIResponse = await axios.get(newsAPIUrl);
+    const newsAPIResponse = await axios.get(
+      `https://newsapi.org/v2/everything?q=${query}&language=en&apiKey=${NEWS_API_KEY}`
+    );
     if (newsAPIResponse.data?.articles?.length > 0) {
-      return res.json(newsAPIResponse.data);
+      results.articles = [...newsAPIResponse.data.articles];
     }
-    console.warn('⚠️ NewsAPI search returned no results. Trying GNews...');
   } catch (error) {
     console.error('❌ NewsAPI Search Error:', error.response?.data || error.message);
   }
 
   try {
-    const gnewsResponse = await axios.get(gnewsAPIUrl);
+    const gnewsResponse = await axios.get(
+      `https://gnews.io/api/v4/search?q=${query}&lang=en&apikey=${GNEWS_API_KEY}`
+    );
     if (gnewsResponse.data?.articles?.length > 0) {
-      return res.json(gnewsResponse.data);
+      results.articles = [...results.articles, ...gnewsResponse.data.articles];
     }
-    console.warn('⚠️ GNews search also returned no results.');
   } catch (error) {
     console.error('❌ GNews Search Error:', error.response?.data || error.message);
   }
 
-  res.json({ articles: [] }); // Return empty if no results found
+  res.json(results);
 });
 
 // Start Server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
 
 
 
