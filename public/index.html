@@ -671,16 +671,8 @@ document.addEventListener("DOMContentLoaded", () => {
     background: #0056b3;
   }
 </style>
-
-
-
-
-
-
-
-
-      <!-- Subscription Section -->
-  <section class="subscription-section">
+<!-- Subscription Section -->
+<section class="subscription-section">
   <h2>Subscribe to Our Daily News Feed</h2>
   <div class="subscription-form">
     <input type="email" id="email-input" placeholder="Enter your email address" required>
@@ -688,32 +680,37 @@ document.addEventListener("DOMContentLoaded", () => {
   </div>
   <p id="subscription-message"></p>
 </section>
+
 <script>
   function subscribeUser() {
     const email = document.getElementById("email-input").value;
     const message = document.getElementById("subscription-message");
 
     if (!email.includes("@")) {
-  message.textContent = "Please enter a valid email address!";
-  return;
-  }
+      message.textContent = "Please enter a valid email address!";
+      message.style.color = "red";
+      return;
+    }
 
-   fetch("https://your-render-backend.onrender.com/api/subscribe", {
+    fetch("https://ai-powered-news-aggregator-backend.onrender.com/api/subscribe", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
     })
-    
+    .then(response => response.json()) // Ensure response is parsed as JSON
     .then(data => {
-   message.textContent = data.message || "Subscription successful!";
-   document.getElementById("email-input").value = ""; // Clear input
-})
+      message.textContent = data.message || "Subscription successful!";
+      message.style.color = "green";
+      document.getElementById("email-input").value = ""; // Clear input field
+    })
     .catch(error => {
       console.error("Error subscribing:", error);
       message.textContent = "Subscription failed. Try again!";
+      message.style.color = "red";
     });
   }
 </script>
+
   <!-- Footer -->
   <footer class="footer">
     <p>© 2025 NewsSphere | <a href="terms-of-service.html">Terms of Service</a> | <a href="privacy-policy.html">Privacy Policy</a></p>
