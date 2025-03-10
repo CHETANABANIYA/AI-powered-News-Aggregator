@@ -215,50 +215,67 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
 
   <script>
-    // Toggle password visibility
-    function togglePassword() {
-      var password = document.getElementById("password");
-      var eyeIcon = document.querySelector(".eye-icon");
-      
-      if (password.type === "password") {
-          password.type = "text";
-          eyeIcon.classList.remove("fa-eye");
-          eyeIcon.classList.add("fa-eye-slash");
-      } else {
-          password.type = "password";
-          eyeIcon.classList.remove("fa-eye-slash");
-          eyeIcon.classList.add("fa-eye");
-      }
+  // Toggle password visibility
+  function togglePassword() {
+    var password = document.getElementById("password");
+    var eyeIcon = document.querySelector(".eye-icon");
+
+    if (password.type === "password") {
+        password.type = "text";
+        eyeIcon.classList.remove("fa-eye");
+        eyeIcon.classList.add("fa-eye-slash");
+    } else {
+        password.type = "password";
+        eyeIcon.classList.remove("fa-eye-slash");
+        eyeIcon.classList.add("fa-eye");
     }
+  }
 
-    // Simulate login process
-    document.getElementById("login-form").addEventListener("submit", function(event) {
-      event.preventDefault();
+  // Login Functionality
+  document.getElementById("login-form").addEventListener("submit", async function(event) {
+    event.preventDefault();
+    document.getElementById("loading").style.display = 'block';
+    document.getElementById("error-message").style.display = 'none';
 
-      document.getElementById("loading").style.display = 'block';
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
-      setTimeout(function() {
-        document.getElementById("loading").style.display = 'none';
+    try {
+      const response = await fetch("https://ai-powered-news-aggregator-backend.onrender.com/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
 
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
+      const data = await response.json();
+      document.getElementById("loading").style.display = 'none';
 
-        // Simulating incorrect credentials
-        if (email !== 'user@example.com' || password !== 'password123') {
-          document.getElementById("error-message").style.display = 'block';
-        } else {
-          alert('Login Successful!');
-        }
-      }, 2000);
-    });
-    
-    // Handle Sign Up link
-document.getElementById('sign-up-link').addEventListener('click', (event) => {
-  event.preventDefault();
-  window.location.href = 'signup.html'; // Redirect to the signup page
-});
+      if (response.ok) {
+        alert("Login Successful!");
+        localStorage.setItem("token", data.token); // Save token for future API requests
+        window.location.href = "index.html"; // Redirect to homepage
+      } else {
+        document.getElementById("error-message").textContent = data.message || "Invalid email or password.";
+        document.getElementById("error-message").style.display = 'block';
+      }
+    } catch (error) {
+      console.error("Login Error:", error);
+      document.getElementById("loading").style.display = 'none';
+      document.getElementById("error-message").textContent = "An error occurred. Try again!";
+      document.getElementById("error-message").style.display = 'block';
+    }
+  });
 
-  </script>
+  // Google & Facebook Login
+  document.getElementById("google-login").addEventListener("click", function() {
+    window.location.href = "https://ai-powered-news-aggregator-backend.onrender.com/api/auth/google";
+  });
+
+  document.getElementById("facebook-login").addEventListener("click", function() {
+    window.location.href = "https://ai-powered-news-aggregator-backend.onrender.com/api/auth/facebook";
+  });
+</script>
+
   <script src="js/script.js"></script>
 </body>
 </html>

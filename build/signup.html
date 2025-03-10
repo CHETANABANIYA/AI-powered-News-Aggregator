@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="en">
+<head>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&amp;family=Roboto:wght@300;400;500&amp;display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
@@ -34,6 +35,10 @@
       text-align: center;
     }
 
+    .input-group {
+      position: relative;
+    }
+
     .signup-container input {
       width: 100%;
       padding: 12px;
@@ -47,6 +52,14 @@
     .signup-container input:focus {
       border-color: #ff6f61;
       box-shadow: 0 0 5px rgba(255, 111, 97, 0.5);
+    }
+
+    .eye-icon {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
     }
 
     .signup-container button {
@@ -72,15 +85,6 @@
         transform: translateY(0);
       }
     }
-
-
-    /* Eye Icon to Toggle Password Visibility */
-    .eye-icon {
-      position: absolute;
-      right: 46px;
-      top: 44%;
-      cursor:pointer;
-}
 
     .footer {
       text-align: center;
@@ -125,6 +129,13 @@
     .spinner-border {
       color: #ff6f61;
     }
+
+    #loading {
+      display: none;
+      text-align: center;
+      margin-top: 10px;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -133,18 +144,20 @@
   <div class="signup-container">
     <h2>Create Your Account</h2>
     <form id="signup-form">
-      <input type="text" id="name" placeholder="Enter your name" required="">
-      <input type="email" id="email" placeholder="Enter your email" required="">
-      <input type="password" id="password" placeholder="Enter your password" required="">
-      <i class="fas fa-eye eye-icon" onclick="togglePassword()"></i>
+      <input type="text" id="name" placeholder="Enter your name" required>
+      <input type="email" id="email" placeholder="Enter your email" required>
+      <div class="input-group">
+        <input type="password" id="password" placeholder="Enter your password" required>
+        <i class="fas fa-eye eye-icon" onclick="togglePassword()"></i>
+      </div>
       <button type="submit">Sign Up</button>
     </form>
 
-    <div id="loading" style="display: none; text-align: center;">
+    <div id="loading">
       <i class="fas fa-spinner fa-spin"></i> Creating your account...
     </div>
 
-    <p class="footer">Already have an account? <a href="login.html">Login</a></p>
+    <p class="footer">Already have an account? <a href="login.html" id="login-link">Login</a></p>
 
     <!-- Social Media Signup -->
     <button class="btn-google"><i class="fab fa-google"></i> Sign Up with Google</button>
@@ -155,38 +168,129 @@
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
-  <script src="script signup.js"></script>
+  <script src="js/signup.js"></script>
+
   <script>
- // Toggle password visibility
+    // Toggle password visibility
     function togglePassword() {
       var password = document.getElementById("password");
       var eyeIcon = document.querySelector(".eye-icon");
       
       if (password.type === "password") {
-          password.type = "text";
-          eyeIcon.classList.remove("fa-eye");
-          eyeIcon.classList.add("fa-eye-slash");
+        password.type = "text";
+        eyeIcon.classList.remove("fa-eye");
+        eyeIcon.classList.add("fa-eye-slash");
       } else {
-          password.type = "password";
-          eyeIcon.classList.remove("fa-eye-slash");
-          eyeIcon.classList.add("fa-eye");
+        password.type = "password";
+        eyeIcon.classList.remove("fa-eye-slash");
+        eyeIcon.classList.add("fa-eye");
       }
-    } 
-    // Simulate signup process
-    document.getElementById("signup-form").addEventListener("submit", function(event) {
-      event.preventDefault();
+    }
 
-      document.getElementById("loading").style.display = 'block';
+    // Signup form submission
+    document.addEventListener("DOMContentLoaded", function () {
+  const form = document.getElementById("signup-form");
+  const nameInput = document.getElementById("name");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  const submitBtn = form.querySelector("button");
+  const loading = document.getElementById("loading");
 
-      setTimeout(function() {
-        document.getElementById("loading").style.display = 'none';
+  function showError(input, message) {
+    let error = input.nextElementSibling;
+    if (!error || !error.classList.contains("error-message")) {
+      error = document.createElement("div");
+      error.className = "error-message";
+      input.parentNode.appendChild(error);
+    }
+    error.textContent = message;
+    input.style.borderColor = "red";
+  }
 
-        const name = document.getElementById("name").value;
-        const email = document.getElementById("email").value;
+  function clearError(input) {
+    let error = input.nextElementSibling;
+    if (error && error.classList.contains("error-message")) {
+      error.remove();
+    }
+    input.style.borderColor = "#ddd";
+  }
 
-        alert(`Account created for ${name} (${email})!`);
-      }, 2000);
-    });
+  function validateEmail(email) {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  }
+
+  function validatePassword(password) {
+    return password.length >= 8 && /[A-Z]/.test(password) && /\d/.test(password) && /[^A-Za-z0-9]/.test(password);
+  }
+
+  form.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    let isValid = true;
+    
+    // Clear previous errors
+    clearError(nameInput);
+    clearError(emailInput);
+    clearError(passwordInput);
+
+    if (nameInput.value.trim() === "") {
+      showError(nameInput, "Name is required");
+      isValid = false;
+    }
+
+    if (!validateEmail(emailInput.value)) {
+      showError(emailInput, "Invalid email format");
+      isValid = false;
+    }
+
+    if (!validatePassword(passwordInput.value)) {
+      showError(passwordInput, "Password must be at least 8 characters, include an uppercase letter, a number, and a special character");
+      isValid = false;
+    }
+
+    if (!isValid) return;
+    
+    // Disable button and show loading
+    submitBtn.disabled = true;
+    loading.style.display = "block";
+    
+    try {
+      const response = await fetch("https://ai-powered-news-aggregator-backend.onrender.com/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: nameInput.value,
+          email: emailInput.value,
+          password: passwordInput.value,
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        localStorage.setItem("signupSuccess", "true");
+        window.location.href = "login.html";
+      } else {
+        alert(`❌ Signup failed: ${data.message}`);
+      }
+    } catch (error) {
+      alert("❌ Error signing up. Please try again.");
+    }
+    
+    // Re-enable button and hide loading
+    submitBtn.disabled = false;
+    loading.style.display = "none";
+  });
+
+  // Show success message on login page if redirected after signup
+  if (localStorage.getItem("signupSuccess")) {
+    alert("✅ Account created successfully! You can now log in.");
+    localStorage.removeItem("signupSuccess");
+  }
+});
+
   </script>
+
 </body>
 </html>
+
