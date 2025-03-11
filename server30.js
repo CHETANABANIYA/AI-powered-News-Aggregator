@@ -17,12 +17,16 @@ app.use(cors({
     allowedHeaders: 'Content-Type'
 }));
 
+// ✅ Middleware for JSON & URL-encoded data
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // ✅ Express session for authentication
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'your_secret_key',
+    secret: process.env.SESSION_SECRET || '949785c8c2958b818acc15abaacde58f3d2e9af4f05a9e76ec15ff549eefcad1',
     resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false } // Set to true if using HTTPS
+    saveUninitialized: false, // Prevent empty session creation
+    cookie: { secure: process.env.NODE_ENV === 'production', httpOnly: true, sameSite: 'lax' } // Secure cookies
 }));
 
 // ✅ Initialize Passport.js for authentication
@@ -37,19 +41,6 @@ app.use('/api/auth', authRoutes);
 const buildPath = path.join(__dirname, 'build');
 app.use(express.static(buildPath));
 
-// ✅ Serve login & signup pages
-app.get('/login', (req, res) => {
-    res.sendFile(path.join(buildPath, 'login.html'), (err) => {
-        if (err) res.status(404).send("Login page not found.");
-    });
-});
-
-app.get('/signup', (req, res) => {
-    res.sendFile(path.join(buildPath, 'signup.html'), (err) => {
-        if (err) res.status(404).send("Signup page not found.");
-    });
-});
-
 // ✅ Catch-all route for React SPA
 app.get('*', (req, res) => {
     res.sendFile(path.join(buildPath, 'index.html'), (err) => {
@@ -61,6 +52,7 @@ app.get('*', (req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server running at http://0.0.0.0:${PORT}`);
 });
+
 
 
 
