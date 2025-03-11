@@ -1,3 +1,4 @@
+// server.js
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
@@ -23,10 +24,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // ✅ Express session for authentication
 app.use(session({
-    secret: process.env.SESSION_SECRET || '949785c8c2958b818acc15abaacde58f3d2e9af4f05a9e76ec15ff549eefcad1',
+    secret: process.env.SESSION_SECRET || 'your_default_secret',
     resave: false,
-    saveUninitialized: false, // Prevent empty session creation
-    cookie: { secure: process.env.NODE_ENV === 'production', httpOnly: true, sameSite: 'lax' } // Secure cookies
+    saveUninitialized: false,
+    cookie: { secure: process.env.NODE_ENV === 'production', httpOnly: true, sameSite: 'lax' }
 }));
 
 // ✅ Initialize Passport.js for authentication
