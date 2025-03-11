@@ -11,7 +11,6 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const RedisStore = require("connect-redis").default;
 
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 app.set('trust proxy', 1);
@@ -37,18 +36,18 @@ app.use(session({ secret: SESSION_SECRET, resave: false, saveUninitialized: true
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new GoogleStrategy({ clientID: GOOGLE_CLIENT_ID, clientSecret: GOOGLE_CLIENT_SECRET, callbackURL: "/auth/google/callback" }, (accessToken, refreshToken, profile, done) => done(null, profile)));
-passport.use(new FacebookStrategy({ clientID: FACEBOOK_CLIENT_ID, clientSecret: FACEBOOK_CLIENT_SECRET, callbackURL: "/auth/facebook/callback", profileFields: ['id', 'displayName', 'photos', 'email'] }, (accessToken, refreshToken, profile, done) => done(null, profile)));
+passport.use(new GoogleStrategy({ clientID: GOOGLE_CLIENT_ID, clientSecret: GOOGLE_CLIENT_SECRET, callbackURL: "/api/auth/google/callback" }, (accessToken, refreshToken, profile, done) => done(null, profile)));
+passport.use(new FacebookStrategy({ clientID: FACEBOOK_CLIENT_ID, clientSecret: FACEBOOK_CLIENT_SECRET, callbackURL: "/api/auth/facebook/callback", profileFields: ['id', 'displayName', 'photos', 'email'] }, (accessToken, refreshToken, profile, done) => done(null, profile)));
 
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
 
 // ✅ Authentication Routes
-app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/' }), (req, res) => res.redirect('https://ai-powered-news-aggregator.vercel.app'));
+app.get('/api/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+app.get('/api/auth/google/callback', passport.authenticate('google', { failureRedirect: '/' }), (req, res) => res.redirect('https://ai-powered-news-aggregator.vercel.app'));
 
-app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }));
-app.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/' }), (req, res) => res.redirect('https://ai-powered-news-aggregator.vercel.app'));
+app.get('/api/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+app.get('/api/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/' }), (req, res) => res.redirect('https://ai-powered-news-aggregator.vercel.app'));
 
 // ✅ Rate Limiting
 app.use('/api/news', rateLimit({ windowMs: 10 * 60 * 1000, max: 50, message: { error: 'Too many requests, try again later.' } }));
@@ -124,6 +123,7 @@ app.post("/api/subscribe", async (req, res) => {
 
 // ✅ Start Server
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
 
 
 
