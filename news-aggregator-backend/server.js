@@ -13,13 +13,16 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// ✅ Fix for rate limiter issue on Render
+app.set('trust proxy', 1);
+
 // ✅ API Keys & Configurations
 const NEWS_API_KEY = process.env.NEWS_API_KEY || 'c8f7bbd1aa7b4719ae619139984f2b08';
 const GNEWS_API_KEY = process.env.GNEWS_API_KEY || '10998e49626e56d8e92a5a9470f0d169';
 const MAILCHIMP_API_KEY = process.env.MAILCHIMP_API_KEY || "8a4236f395858305478b31637a3c3b9e-us11";
 const MAILCHIMP_LIST_ID = process.env.MAILCHIMP_LIST_ID || "6918a248d2";
-const REDIS_URL = process.env.REDIS_URL || "redis://default:your_redis_url";
-const SESSION_SECRET = process.env.SESSION_SECRET || "your_secure_secret";
+const REDIS_URL = process.env.REDIS_URL || "redis://default:AWr_AAIjcDFkYWI2MWQ2MTA1OTQ0NWE4YTFjYTVmN2FhMDVhM2UzZXAxMA@closing-mantis-27391.upstash.io:6379";
+const SESSION_SECRET = process.env.SESSION_SECRET || "949785c8c2958b818acc15abaacde58f3d2e9af4f05a9e76ec15ff549eefcad1";
 
 // ✅ Mailchimp Config
 mailchimp.setConfig({
