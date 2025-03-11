@@ -9,6 +9,8 @@ const session = require('express-session');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
+const RedisStore = require("connect-redis").default;
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
