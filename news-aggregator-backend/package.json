@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "Backend for AI-Powered News Aggregator",
   "main": "server.js",
+  "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "install": "npm install"
   },
   "engines": {
     "node": ">=18 <=22"
@@ -20,8 +22,10 @@
     "passport": "^0.6.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-facebook": "^3.0.0",
+    "passport-oauth2": "^1.6.0",
     "express-session": "^1.17.3"
   }
 }
+
 
 
