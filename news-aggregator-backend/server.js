@@ -2,14 +2,15 @@ import dotenv from "dotenv";
 import express from "express";
 import axios from "axios";
 import cors from "cors";
-import { createClient } from "redis"; // ✅ Corrected import
 import rateLimit from "express-rate-limit";
 import mailchimp from "@mailchimp/mailchimp_marketing";
-import session from "express-session"; // ✅ Changed to direct import
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as FacebookStrategy } from "passport-facebook";
+import session from "express-session";
+import Redis from "redis";
 
+// Load environment variables
 dotenv.config();
 
 const app = express();
@@ -41,65 +42,88 @@ const {
 mailchimp.setConfig({ apiKey: MAILCHIMP_API_KEY, server: "us11" });
 
 // ✅ CORS Configuration
-const allowedOrigins = ["http://localhost:3000", "https://ai-powered-news-aggregator.vercel.app"];
-app.use(cors({
-  origin: (origin, callback) =>
-    allowedOrigins.includes(origin) || !origin ? callback(null, true) : callback(new Error("Not allowed by CORS")),
-  methods: ["GET", "POST"],
-  allowedHeaders: ["Content-Type"],
-}));
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://ai-powered-news-aggregator.vercel.app"
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) =>
+      allowedOrigins.includes(origin) || !origin ? callback(null, true) : callback(new Error("Not allowed by CORS")),
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
 
 app.use(express.json());
 
 // ✅ Session & Passport Setup
-app.use(session({
-  secret: SESSION_SECRET,
-  resave: false,
-  saveUninitialized: true,
-}));
-
+app.use(
+  session({
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 app.use(passport.initialize());
 app.use(passport.session());
 
 // ✅ Google OAuth Strategy
-passport.use(new GoogleStrategy({
-  clientID: GOOGLE_CLIENT_ID,
-  clientSecret: GOOGLE_CLIENT_SECRET,
-  callbackURL: "/api/auth/google/callback",
-}, (accessToken, refreshToken, profile, done) => done(null, profile)));
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
+      callbackURL: "/api/auth/google/callback",
+    },
+    (accessToken, refreshToken, profile, done) => done(null, profile)
+  )
+);
 
-passport.use(new FacebookStrategy({
-  clientID: FACEBOOK_CLIENT_ID,
-  clientSecret: FACEBOOK_CLIENT_SECRET,
-  callbackURL: "/api/auth/facebook/callback",
-  profileFields: ["id", "displayName", "photos", "email"],
-}, (accessToken, refreshToken, profile, done) => done(null, profile)));
+// ✅ Facebook OAuth Strategy
+passport.use(
+  new FacebookStrategy(
+    {
+      clientID: FACEBOOK_CLIENT_ID,
+      clientSecret: FACEBOOK_CLIENT_SECRET,
+      callbackURL: "/api/auth/facebook/callback",
+      profileFields: ["id", "displayName", "photos", "email"],
+    },
+    (accessToken, refreshToken, profile, done) => done(null, profile)
+  )
+);
 
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
 
 // ✅ Authentication Routes
 app.get("/api/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
-app.get("/api/auth/google/callback",
+app.get(
+  "/api/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/" }),
   (req, res) => res.redirect("https://ai-powered-news-aggregator.vercel.app")
 );
 
 app.get("/api/auth/facebook", passport.authenticate("facebook", { scope: ["email"] }));
-app.get("/api/auth/facebook/callback",
+app.get(
+  "/api/auth/facebook/callback",
   passport.authenticate("facebook", { failureRedirect: "/" }),
   (req, res) => res.redirect("https://ai-powered-news-aggregator.vercel.app")
 );
 
 // ✅ Rate Limiting
-app.use("/api/news", rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 50,
-  message: { error: "Too many requests, try again later." },
-}));
+app.use(
+  "/api/news",
+  rateLimit({
+    windowMs: 10 * 60 * 1000, // 10 minutes
+    max: 50,
+    message: { error: "Too many requests, try again later." },
+  })
+);
 
 // ✅ Redis Setup
-const redisClient = createClient({ url: REDIS_URL, socket: { tls: true } });
+const redisClient = Redis.createClient({ url: REDIS_URL, socket: { tls: true } });
 
 redisClient.on("error", (err) => console.error(`❌ Redis Error: ${err.message}`));
 redisClient.connect().then(() => console.log("✅ Connected to Redis"));
@@ -107,13 +131,17 @@ redisClient.connect().then(() => console.log("✅ Connected to Redis"));
 // ✅ Fetch News from APIs
 const fetchNewsFromAPIs = async (category, country, language) => {
   try {
-    const newsAPIResponse = await axios.get(`https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&language=${language}&apiKey=${NEWSAPI_KEY}`);
+    const newsAPIResponse = await axios.get(
+      `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&language=${language}&apiKey=${NEWSAPI_KEY}`
+    );
     if (newsAPIResponse.data?.articles?.length > 0) return newsAPIResponse.data;
   } catch (error) {
     console.error("❌ NewsAPI Error:", error.response?.data || error.message);
   }
   try {
-    const gnewsResponse = await axios.get(`https://gnews.io/api/v4/top-headlines?category=${category}&country=${country}&lang=${language}&apikey=${GNEWS_API_KEY}`);
+    const gnewsResponse = await axios.get(
+      `https://gnews.io/api/v4/top-headlines?category=${category}&country=${country}&lang=${language}&apikey=${GNEWS_API_KEY}`
+    );
     if (gnewsResponse.data?.articles?.length > 0) return gnewsResponse.data;
   } catch (error) {
     console.error("❌ GNews Error:", error.response?.data || error.message);
@@ -137,21 +165,25 @@ app.get("/api/news", async (req, res) => {
 });
 
 // ✅ Search News Route
-app.get('/api/news/search', async (req, res) => {
+app.get("/api/news/search", async (req, res) => {
   const query = req.query.query;
-  if (!query) return res.status(400).json({ error: 'Missing query parameter' });
+  if (!query) return res.status(400).json({ error: "Missing query parameter" });
   let results = { articles: [] };
   try {
-    const newsAPIResponse = await axios.get(`https://newsapi.org/v2/everything?q=${query}&language=en&apiKey=${NEWSAPI_KEY}`);
+    const newsAPIResponse = await axios.get(
+      `https://newsapi.org/v2/everything?q=${query}&language=en&apiKey=${NEWSAPI_KEY}`
+    );
     if (newsAPIResponse.data?.articles?.length > 0) results.articles = [...newsAPIResponse.data.articles];
   } catch (error) {
-    console.error('❌ NewsAPI Search Error:', error.response?.data || error.message);
+    console.error("❌ NewsAPI Search Error:", error.response?.data || error.message);
   }
   try {
-    const gnewsResponse = await axios.get(`https://gnews.io/api/v4/search?q=${query}&lang=en&apikey=${GNEWS_API_KEY}`);
+    const gnewsResponse = await axios.get(
+      `https://gnews.io/api/v4/search?q=${query}&lang=en&apikey=${GNEWS_API_KEY}`
+    );
     if (gnewsResponse.data?.articles?.length > 0) results.articles = [...results.articles, ...gnewsResponse.data.articles];
   } catch (error) {
-    console.error('❌ GNews Search Error:', error.response?.data || error.message);
+    console.error("❌ GNews Search Error:", error.response?.data || error.message);
   }
   res.json(results);
 });
@@ -170,6 +202,7 @@ app.post("/api/subscribe", async (req, res) => {
 
 // ✅ Start Server
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
 
 
 
