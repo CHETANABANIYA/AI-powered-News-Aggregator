@@ -1,5 +1,5 @@
 const express = require('express');
-const passport = require('../passport'); // Import passport config
+const passport = require('passport'); // Directly import passport from server.js
 const router = express.Router();
 
 // ✅ Middleware to check authentication
@@ -15,7 +15,7 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 
 // ✅ Google Auth Callback Route
 router.get('/google/callback', 
-    passport.authenticate('google', { failureRedirect: '/login-failed' }), 
+    passport.authenticate('google', { failureRedirect: '/api/auth/login-failed' }), 
     (req, res) => {
         console.log("✅ Google Auth Success:", req.user);
         res.redirect('https://ai-powered-news-aggregator.vercel.app');
@@ -27,7 +27,7 @@ router.get('/facebook', passport.authenticate('facebook', { scope: ['email'] }))
 
 // ✅ Facebook Auth Callback Route
 router.get('/facebook/callback', 
-    passport.authenticate('facebook', { failureRedirect: '/login-failed' }), 
+    passport.authenticate('facebook', { failureRedirect: '/api/auth/login-failed' }), 
     (req, res) => {
         console.log("✅ Facebook Auth Success:", req.user);
         res.redirect('https://ai-powered-news-aggregator.vercel.app');
@@ -37,11 +37,7 @@ router.get('/facebook/callback',
 // ✅ Check Authentication Status
 router.get('/status', (req, res) => {
     console.log("🔍 Checking auth status:", req.user);
-    if (req.isAuthenticated()) {
-        res.json({ authenticated: true, user: req.user });
-    } else {
-        res.json({ authenticated: false });
-    }
+    res.json({ authenticated: req.isAuthenticated(), user: req.user || null });
 });
 
 // ✅ Logout Route
@@ -58,6 +54,7 @@ router.get('/login-failed', (req, res) => {
 });
 
 module.exports = router;
+
 
 
 
