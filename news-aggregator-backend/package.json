@@ -8,7 +8,7 @@
     "start": "node server.js"
   },
   "engines": {
-    "node": ">=18 <=22"
+    "node": "18.x"
   },
   "dependencies": {
     "@mailchimp/mailchimp_marketing": "^3.0.80",
@@ -25,5 +25,6 @@
     "express-session": "^1.17.3"
   }
 }
+
 
 
