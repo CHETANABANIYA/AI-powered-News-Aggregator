@@ -1,11 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./signup.css";
 
 export default function Signup() {
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Load Facebook SDK
+    window.fbAsyncInit = function () {
+      window.FB.init({
+        appId: "1182578409398725",
+        cookie: true,
+        xfbml: true,
+        version: "v18.0",
+      });
+    };
+
+    (function (d, s, id) {
+      let js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s);
+      js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    })(document, "script", "facebook-jssdk");
+  }, []);
+
+  const togglePassword = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -43,7 +69,16 @@ export default function Signup() {
   };
 
   const handleFacebookSignup = () => {
-    window.location.href = "https://ai-powered-news-aggregator-backend.onrender.com/auth/facebook";
+    window.FB.login(
+      function (response) {
+        if (response.authResponse) {
+          window.location.href = `https://ai-powered-news-aggregator-backend.onrender.com/auth/facebook?access_token=${response.authResponse.accessToken}`;
+        } else {
+          setError("Facebook signup failed. Please try again.");
+        }
+      },
+      { scope: "email,public_profile" }
+    );
   };
 
   return (
@@ -52,7 +87,11 @@ export default function Signup() {
       <form onSubmit={handleSignup}>
         <input type="text" name="name" placeholder="Full Name" required />
         <input type="email" name="email" placeholder="Email Address" required />
-        <input type="password" name="password" placeholder="Password" required />
+
+        <div className="password-container">
+          <input type={showPassword ? "text" : "password"} name="password" placeholder="Password" required />
+          <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"} eye-icon`} onClick={togglePassword}></i>
+        </div>
 
         <button type="submit" disabled={loading}>
           {loading ? <i className="fas fa-spinner fa-spin"></i> : "Sign Up"}
@@ -74,4 +113,5 @@ export default function Signup() {
     </div>
   );
 }
+
 
