@@ -15,7 +15,8 @@
   },
   "dependencies": {
     "@mailchimp/mailchimp_marketing": "^3.0.80",
-    "axios": "^1.8.1",
+    "axios": "^1.8.3",
+    "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
     "bootstrap": "^5.3.2",
     "connect-redis": "^8.0.2",
