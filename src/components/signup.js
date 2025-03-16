@@ -27,7 +27,19 @@ export default function Signup() {
       js.src = "https://connect.facebook.net/en_US/sdk.js";
       fjs.parentNode.insertBefore(js, fjs);
     })(document, "script", "facebook-jssdk");
-  }, []);
+
+    // ✅ Fetch authenticated user on mount
+    fetch("https://ai-powered-news-aggregator-backend.onrender.com/api/auth/user", {
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user) {
+          navigate("/"); // Redirect if already logged in
+        }
+      })
+      .catch(() => {});
+  }, [navigate]);
 
   const togglePassword = () => {
     setShowPassword(!showPassword);
@@ -65,14 +77,14 @@ export default function Signup() {
   };
 
   const handleGoogleSignup = () => {
-    window.location.href = "https://ai-powered-news-aggregator-backend.onrender.com/auth/google";
+    window.location.href = "https://ai-powered-news-aggregator-backend.onrender.com/api/auth/google";
   };
 
   const handleFacebookSignup = () => {
     window.FB.login(
       function (response) {
         if (response.authResponse) {
-          window.location.href = `https://ai-powered-news-aggregator-backend.onrender.com/auth/facebook?access_token=${response.authResponse.accessToken}`;
+          window.location.href = `https://ai-powered-news-aggregator-backend.onrender.com/api/auth/facebook?access_token=${response.authResponse.accessToken}`;
         } else {
           setError("Facebook signup failed. Please try again.");
         }
@@ -100,17 +112,10 @@ export default function Signup() {
 
       {error && <div className="error-message">{error}</div>}
 
-      <p className="footer">
-        Already have an account? <a href="/login">Login</a>
-      </p>
-
-      <button className="btn-google" onClick={handleGoogleSignup}>
-        <i className="fab fa-google"></i> Sign Up with Google
-      </button>
-      <button className="btn-facebook" onClick={handleFacebookSignup}>
-        <i className="fab fa-facebook-f"></i> Sign Up with Facebook
-      </button>
+      <button className="btn-google" onClick={handleGoogleSignup}>Sign Up with Google</button>
+      <button className="btn-facebook" onClick={handleFacebookSignup}>Sign Up with Facebook</button>
     </div>
   );
 }
+
 
