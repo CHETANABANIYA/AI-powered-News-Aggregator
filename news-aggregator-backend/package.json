@@ -26,7 +26,8 @@
   "passport-oauth2": "^1.6.0",
   "express-session": "^1.17.3",
   "mongoose": "^7.6.0"
-  }
+}
+
 }
 
 
