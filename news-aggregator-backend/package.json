@@ -23,7 +23,9 @@
     "passport-google-oauth20": "^2.0.0",
     "passport-facebook": "^3.0.0",
     "passport-oauth2": "^1.6.0",
-    "express-session": "^1.17.3"
+    "express-session": "^1.17.3",
+    "mongoose": "^7.6.0"
   }
 }
+
 
