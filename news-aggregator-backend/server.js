@@ -74,13 +74,11 @@ redisClient.on("error", (err) => console.error(`❌ Redis Error: ${err.message}`
 })();
 
 // ✅ Redis Session Store - FIXED
-// Create Redis session store
-const RedisStore = connectRedis(session);
-const RedisStoreInstance = new RedisStore({ client: redisClient, prefix: "sess:" });
+const store = new RedisStore({ client: redisClient });
 
 app.use(
   session({
-    store: RedisStoreInstance,
+    store,
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
@@ -107,6 +105,12 @@ app.use(
 );
 
 app.use(express.json());
+
+// ✅ Mailchimp Configuration - FIXED
+mailchimp.setConfig({
+  apiKey: MAILCHIMP_API_KEY,
+  server: MAILCHIMP_API_KEY.split("-")[1],
+});
 
 // ✅ Passport Setup
 app.use(passport.initialize());
@@ -220,6 +224,7 @@ app.post("/api/subscribe", async (req, res, next) => {
 
 // ✅ Start Server
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
 
 
 
