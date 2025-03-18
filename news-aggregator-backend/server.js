@@ -117,16 +117,20 @@ passport.deserializeUser((obj, done) => done(null, obj));
 // ✅ Generate JWT Token
 const generateToken = (email) => jwt.sign({ email }, JWT_SECRET, { expiresIn: "7d" });
 
-// ✅ News Fetching Logic
+// ✅ Fetch News from APIs
 const fetchNewsFromAPIs = async (category, country, language) => {
   try {
-    const newsAPIResponse = await axios.get(`https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&language=${language}&apiKey=${NEWSAPI_KEY}`);
+    const newsAPIResponse = await axios.get(
+      `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&language=${language}&apiKey=${NEWSAPI_KEY}`
+    );
     if (newsAPIResponse.data?.articles?.length > 0) return newsAPIResponse.data;
   } catch (error) {
     console.error("❌ NewsAPI Error:", error.message);
   }
   try {
-    const gnewsResponse = await axios.get(`https://gnews.io/api/v4/top-headlines?category=${category}&country=${country}&lang=${language}&apikey=${GNEWS_API_KEY}`);
+    const gnewsResponse = await axios.get(
+      `https://gnews.io/api/v4/top-headlines?category=${category}&country=${country}&lang=${language}&apikey=${GNEWS_API_KEY}`
+    );
     if (gnewsResponse.data?.articles?.length > 0) return gnewsResponse.data;
   } catch (error) {
     console.error("❌ GNews Error:", error.message);
@@ -196,8 +200,6 @@ app.use((err, req, res, next) => {
 
 // ✅ Start Server
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-
-
 
 
 
