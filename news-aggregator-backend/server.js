@@ -10,7 +10,7 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as FacebookStrategy } from "passport-facebook";
 import session from "express-session";
 import { createClient } from "redis";
-import connectredis from "connect-redis"; 
+import connectRedis from "connect-redis"; 
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -65,7 +65,8 @@ redisClient.on("error", (err) => console.error(`❌ Redis Error: ${err.message}`
 })();
 
 // ✅ Redis Session Store - FIXED
-const RedisStore = connectRedis(session);  // ✅ FIXED
+const RedisStore = connectRedis(session);
+
 app.use(
   session({
     store: new RedisStore({ client: redisClient }),
