@@ -3,16 +3,15 @@ import express from "express";
 import mongoose from "mongoose";
 import axios from "axios";
 import cors from "cors";
-import rateLimit from "express-rate-limit";
-import mailchimp from "@mailchimp/mailchimp_marketing";
+import session from "express-session";
+import { createClient } from "redis";
+import connectRedis from "connect-redis";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as FacebookStrategy } from "passport-facebook";
-import session from "express-session";
-import { createClient } from "redis";
-import RedisStore from "connect-redis";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import mailchimp from "@mailchimp/mailchimp_marketing";
 
 // Load environment variables
 dotenv.config();
@@ -74,7 +73,8 @@ redisClient.on("error", (err) => console.error(`❌ Redis Error: ${err.message}`
 })();
 
 // ✅ Redis Session Store - FIXED
-const store = new RedisStore({ client: redisClient });
+const RedisStore = connectRedis(session);
+const store = new RedisStore({ client: redisClient, prefix: "sess:" });
 
 app.use(
   session({
@@ -224,6 +224,7 @@ app.post("/api/subscribe", async (req, res, next) => {
 
 // ✅ Start Server
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
 
 
 
