@@ -9,8 +9,8 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as FacebookStrategy } from "passport-facebook";
 import session from "express-session";
-import connectRedis from "connect-redis"; 
 import { createClient } from "redis";
+import connectRedis from "connect-redis";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -50,11 +50,6 @@ const contactMessageSchema = new mongoose.Schema({
 });
 const ContactMessage = mongoose.model("ContactMessage", contactMessageSchema);
 
-const RedisStore = connectRedis(session);
-
-// ✅ Mailchimp Config
-mailchimp.setConfig({ apiKey: MAILCHIMP_API_KEY, server: "us11" });
-
 // ✅ Redis Setup
 const redisClient = createClient({ url: REDIS_URL });
 
@@ -68,6 +63,22 @@ redisClient.on("error", (err) => console.error(`❌ Redis Error: ${err.message}`
     console.error("❌ Redis Connection Error:", error.message);
   }
 })();
+
+// ✅ Redis Session Store
+const RedisStore = connectRedis(session);
+
+app.use(
+  session({
+    store: new RedisStore({ client: redisClient }),
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+    },
+  })
+);
 
 // ✅ CORS Configuration
 const allowedOrigins = [
@@ -86,27 +97,10 @@ app.use(
 
 app.use(express.json());
 
-// ✅ Session & Passport Setup
-app.use(
-  session({
-    store: new RedisStore({ client: redisClient }),
-    secret: SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === "production",
-      httpOnly: true
-    }
-  })
-);
+// ✅ Passport Setup
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ✅ Middleware Setup
-app.use(cors());
-app.use(express.json());
-
-// ✅ Google OAuth Strategy
 passport.use(
   new GoogleStrategy(
     {
@@ -118,7 +112,6 @@ passport.use(
   )
 );
 
-// ✅ Facebook OAuth Strategy
 passport.use(
   new FacebookStrategy(
     {
@@ -213,12 +206,6 @@ app.post("/api/subscribe", async (req, res, next) => {
   }
 });
 
-// ✅ Error Handling Middleware
-app.use((err, req, res, next) => {
-  console.error("❌ Server Error:", err.message);
-  res.status(500).json({ error: "Internal Server Error" });
-});
-
 // ✅ Contact Form Route (Saves to MongoDB)
 app.post("/api/contact", async (req, res) => {
   try {
@@ -237,6 +224,7 @@ app.post("/api/contact", async (req, res) => {
 
 // ✅ Start Server
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
 
 
 
