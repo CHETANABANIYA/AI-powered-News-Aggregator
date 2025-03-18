@@ -5,7 +5,7 @@ import axios from "axios";
 import cors from "cors";
 import session from "express-session";
 import { createClient } from "redis";
-const connectRedis = require("connect-redis"); // ✅ Correct
+import connectRedis from "connect-redis"; // ✅ Correct
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import passport from "passport";
@@ -57,11 +57,8 @@ const contactMessageSchema = new mongoose.Schema({
 });
 const ContactMessage = mongoose.model("ContactMessage", contactMessageSchema);
 
-// ✅ Redis Setup
-const redisClient = createClient({
-  url: REDIS_URL,
-  socket: { reconnectStrategy: retries => Math.min(retries * 100, 3000) }
-});
+// ✅ Redis Client Setup
+const redisClient = createClient({ url: process.env.REDIS_URL });
 
 redisClient.on("error", (err) => console.error(`❌ Redis Error: ${err.message}`));
 
@@ -75,14 +72,17 @@ redisClient.on("error", (err) => console.error(`❌ Redis Error: ${err.message}`
   }
 })();
 
-// ✅ Redis Session Store - FIXED
-const RedisStore = connectRedis(session);
-const store = new RedisStore({ client: redisClient, prefix: "sess:" });
+
+// ✅ Redis Session Store - Fixed
+const RedisStore = new (connectRedis(session))({
+  client: redisClient,
+  prefix: "sess:",
+});
 
 app.use(
   session({
-    store,
-    secret: SESSION_SECRET,
+    store: RedisStore,
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
