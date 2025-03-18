@@ -4,7 +4,8 @@ import mongoose from "mongoose";
 import axios from "axios";
 import cors from "cors";
 import session from "express-session";
-import * as connectRedis from "connect-redis";
+import { createClient } from "redis";
+import connectRedis from "connect-redis";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import passport from "passport";
@@ -57,7 +58,10 @@ const contactMessageSchema = new mongoose.Schema({
 const ContactMessage = mongoose.model("ContactMessage", contactMessageSchema);
 
 // ✅ Redis Setup
-const redisClient = createClient({ url: REDIS_URL });
+const redisClient = createClient({
+  url: REDIS_URL,
+  socket: { reconnectStrategy: retries => Math.min(retries * 100, 3000) }
+});
 
 redisClient.on("error", (err) => console.error(`❌ Redis Error: ${err.message}`));
 
@@ -105,7 +109,7 @@ app.use(
 
 app.use(express.json());
 
-// ✅ Mailchimp Configuration - FIXED
+// ✅ Mailchimp Configuration
 mailchimp.setConfig({
   apiKey: MAILCHIMP_API_KEY,
   server: MAILCHIMP_API_KEY.split("-")[1],
@@ -223,6 +227,7 @@ app.post("/api/subscribe", async (req, res, next) => {
 
 // ✅ Start Server
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
 
 
 
