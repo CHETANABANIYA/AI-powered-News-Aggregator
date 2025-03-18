@@ -9,7 +9,7 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as FacebookStrategy } from "passport-facebook";
 import session from "express-session";
-import RedisStore from "connect-redis";
+import connectRedis from "connect-redis"; 
 import { createClient } from "redis";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -49,6 +49,8 @@ const contactMessageSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 const ContactMessage = mongoose.model("ContactMessage", contactMessageSchema);
+
+const RedisStore = connectRedis(session);
 
 // ✅ Mailchimp Config
 mailchimp.setConfig({ apiKey: MAILCHIMP_API_KEY, server: "us11" });
