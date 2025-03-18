@@ -162,7 +162,7 @@ app.get("/api/news/search", async (req, res) => {
   let results = { articles: [] };
   try {
     const newsAPIResponse = await axios.get(
-      https://newsapi.org/v2/everything?q=${query}&language=en&apiKey=${NEWSAPI_KEY}
+      `https://newsapi.org/v2/everything?q=${query}&language=en&apiKey=${NEWSAPI_KEY}`
     );
     if (newsAPIResponse.data?.articles?.length > 0) results.articles = [...newsAPIResponse.data.articles];
   } catch (error) {
@@ -170,7 +170,7 @@ app.get("/api/news/search", async (req, res) => {
   }
   try {
     const gnewsResponse = await axios.get(
-      https://gnews.io/api/v4/search?q=${query}&lang=en&apikey=${GNEWS_API_KEY}
+      `https://gnews.io/api/v4/search?q=${query}&lang=en&apikey=${GNEWS_API_KEY}`
     );
     if (gnewsResponse.data?.articles?.length > 0) results.articles = [...results.articles, ...gnewsResponse.data.articles];
   } catch (error) {
