@@ -5,7 +5,7 @@ import axios from "axios";
 import cors from "cors";
 import session from "express-session";
 import { createClient } from "redis";
-import connectRedis from "connect-redis"; // ✅ Correct for ES Modules
+import connectRedis from "connect-redis"; // ✅ Correct ES Module import
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import passport from "passport";
@@ -72,12 +72,11 @@ redisClient.on("error", (err) => console.error(`❌ Redis Error: ${err.message}`
   }
 })();
 
-// Redis Session Store
-const RedisStore = new (connectRedis(session))({ client: redisClient, prefix: "sess:" });
-
+// Redis Session Store (✅ Fixed `connect-redis` usage)
+const RedisStore = connectRedis(session);
 app.use(
   session({
-    store: RedisStore,
+    store: new RedisStore({ client: redisClient, prefix: "sess:" }),
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
@@ -204,6 +203,7 @@ app.post("/api/subscribe", async (req, res, next) => {
 
 // Start Server
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
 
 
 
