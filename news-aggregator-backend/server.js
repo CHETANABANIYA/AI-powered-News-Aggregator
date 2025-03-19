@@ -5,8 +5,7 @@ import axios from "axios";
 import cors from "cors";
 import session from "express-session";
 import { createClient } from "redis";
-const connectRedis = require("connect-redis");
-
+import connectRedis from "connect-redis"; // ✅ Correct for ES Modules
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import passport from "passport";
