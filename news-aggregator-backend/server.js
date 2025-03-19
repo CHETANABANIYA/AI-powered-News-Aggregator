@@ -5,7 +5,8 @@ import axios from "axios";
 import cors from "cors";
 import session from "express-session";
 import { createClient } from "redis";
-import connectRedis from "connect-redis";
+const connectRedis = require("connect-redis");
+
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import passport from "passport";
