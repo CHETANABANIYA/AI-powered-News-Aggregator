@@ -5,7 +5,8 @@ import axios from "axios";
 import cors from "cors";
 import session from "express-session";
 import { createClient } from "redis";
-import * as connectRedis from "connect-redis"; // ✅ Fix: Use named import
+import connectRedis from "connect-redis";
+ // ✅ Fix: Use named import
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import passport from "passport";
@@ -73,7 +74,7 @@ redisClient.on("error", (err) => console.error(`❌ Redis Error: ${err.message}`
 })();
 
 // Redis Session Store
-const RedisStore = connectRedis.default(session); // ✅ Fix: Correct usage
+const RedisStore = connectRedis(session); // ✅ Fix: Correct usage
 app.use(
   session({
     store: new RedisStore({ client: redisClient, prefix: "sess:" }),
