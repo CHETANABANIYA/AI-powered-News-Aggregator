@@ -1,62 +1,76 @@
 const express = require('express');
-const passport = require('passport'); // Directly import passport from server.js
 const router = express.Router();
+const bcrypt = require('bcryptjs');
+const passport = require('passport');
+const User = require('../models/User'); // Ensure correct path
 
-// ✅ Middleware to check authentication
-const ensureAuthenticated = (req, res, next) => {
-    if (req.isAuthenticated()) {
-        return next();
+// User Signup
+router.post('/signup', async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+        let user = await User.findOne({ email });
+        
+        if (user) {
+            return res.status(400).json({ message: 'User already exists' });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        user = new User({ name, email, password: hashedPassword });
+        await user.save();
+        
+        res.status(201).json({ message: 'User registered successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
     }
-    res.status(401).json({ error: 'Unauthorized' });
-};
+});
 
-// ✅ Google Auth Route
+// User Login
+router.post('/login', (req, res, next) => {
+    passport.authenticate('local', (err, user, info) => {
+        if (err) return res.status(500).json({ message: 'Server error', err });
+        if (!user) return res.status(400).json({ message: info.message });
+        req.logIn(user, (err) => {
+            if (err) return res.status(500).json({ message: 'Login failed' });
+            res.json({ message: 'Login successful', user });
+        });
+    })(req, res, next);
+});
+
+// Google Authentication
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-// ✅ Google Auth Callback Route
-router.get('/google/callback', 
-    passport.authenticate('google', { failureRedirect: '/api/auth/login-failed' }), 
-    (req, res) => {
-        console.log("✅ Google Auth Success:", req.user);
-        res.redirect('https://ai-powered-news-aggregator.vercel.app');
-    }
-);
+router.get('/google/callback', passport.authenticate('google', {
+    failureRedirect: '/login'
+}), (req, res) => {
+    res.redirect('/index.html'); // Redirect to main page after login
+});
 
-// ✅ Facebook Auth Route
+// Facebook Authentication
 router.get('/facebook', passport.authenticate('facebook', { scope: ['email'] }));
 
-// ✅ Facebook Auth Callback Route
-router.get('/facebook/callback', 
-    passport.authenticate('facebook', { failureRedirect: '/api/auth/login-failed' }), 
-    (req, res) => {
-        console.log("✅ Facebook Auth Success:", req.user);
-        res.redirect('https://ai-powered-news-aggregator.vercel.app');
+router.get('/facebook/callback', passport.authenticate('facebook', {
+    failureRedirect: '/login'
+}), (req, res) => {
+    res.redirect('/index.html'); // Redirect to main page after login
+});
+
+// Contact Us Form Submission
+router.post('/contact', async (req, res) => {
+    try {
+        const { name, email, message } = req.body;
+        if (!name || !email || !message) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+        
+        // Save to database (Assuming a Contact model is defined)
+        const newMessage = new Contact({ name, email, message });
+        await newMessage.save();
+
+        res.status(200).json({ message: 'Message sent successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
     }
-);
-
-// ✅ Check Authentication Status
-router.get('/status', (req, res) => {
-    console.log("🔍 Checking auth status:", req.user);
-    res.json({ authenticated: req.isAuthenticated(), user: req.user || null });
-});
-
-// ✅ Logout Route
-router.get('/logout', (req, res, next) => {
-    req.logout((err) => {
-        if (err) return next(err);
-        res.redirect('https://ai-powered-news-aggregator.vercel.app');
-    });
-});
-
-// ✅ Failure Redirect Route (for debugging)
-router.get('/login-failed', (req, res) => {
-    res.status(401).json({ error: "OAuth Login Failed" });
 });
 
 module.exports = router;
-
-
-
-
-
 
