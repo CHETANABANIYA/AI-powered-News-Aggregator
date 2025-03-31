@@ -1,3 +1,4 @@
+// passport.js
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
@@ -5,12 +6,14 @@ require('dotenv').config();
 
 // ✅ Serialize user (store only necessary user data in session)
 passport.serializeUser((user, done) => {
-    done(null, { id: user.id, displayName: user.displayName, email: user.email });
+    done(null, user.id); // Serialize user ID
 });
 
 // ✅ Deserialize user
-passport.deserializeUser((user, done) => {
-    done(null, user);
+passport.deserializeUser((id, done) => {
+    User.findById(id, (err, user) => {
+        done(err, user); // Retrieve user data by ID
+    });
 });
 
 // ✅ Google OAuth Strategy
@@ -53,6 +56,7 @@ passport.use(new FacebookStrategy({
 }));
 
 module.exports = passport;
+
 
 
 

@@ -106,5 +106,13 @@ body, html {
     <a href="signup.html" class="btn">Get Started</a>
   </div>
 
-
+  <script>
+        window.onload = function() {
+            // Check if the user is already logged in (you can use session storage, local storage, or cookies)
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+            if (isLoggedIn) {
+                window.location.href = 'index.html'; // Redirect to Index page if already logged in
+            }
+        };
+    </script>
 </body></html>

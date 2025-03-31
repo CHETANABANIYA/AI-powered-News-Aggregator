@@ -1,4 +1,4 @@
-// server.js
+// server30.js
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // ✅ Express session for authentication
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'your_default_secret',
+    secret: process.env.SESSION_SECRET || '949785c8c2958b818acc15abaacde58f3d2e9af4f05a9e76ec15ff549eefcad1',
     resave: false,
     saveUninitialized: false,
     cookie: { secure: process.env.NODE_ENV === 'production', httpOnly: true, sameSite: 'lax' }
@@ -42,6 +42,14 @@ app.use('/api/auth', authRoutes);
 const buildPath = path.join(__dirname, 'build');
 app.use(express.static(buildPath));
 
+// ✅ Check if user is logged in before serving index.html
+app.get("/index.html", (req, res) => {
+    if (!req.isAuthenticated()) {
+        return res.redirect("/welcome.html"); // Redirect to welcome if not authenticated
+    }
+    res.sendFile(path.join(buildPath, 'index.html'));
+});
+
 // ✅ Catch-all route for React SPA
 app.get('*', (req, res) => {
     res.sendFile(path.join(buildPath, 'index.html'), (err) => {
@@ -53,6 +61,7 @@ app.get('*', (req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server running at http://0.0.0.0:${PORT}`);
 });
+
 
 
 

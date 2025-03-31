@@ -1,3 +1,4 @@
+// auth.js
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
@@ -38,20 +39,6 @@ router.post("/login", (req, res, next) => {
   })(req, res, next);
 });
 
-// 🟢 Google Authentication
-router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
-
-router.get("/google/callback", passport.authenticate("google", { failureRedirect: "/login" }), (req, res) => {
-  res.redirect("https://ai-powered-news-aggregator.vercel.app"); // ✅ Redirect to frontend
-});
-
-// 🟢 Facebook Authentication
-router.get("/facebook", passport.authenticate("facebook", { scope: ["email"] }));
-
-router.get("/facebook/callback", passport.authenticate("facebook", { failureRedirect: "/login" }), (req, res) => {
-  res.redirect("https://ai-powered-news-aggregator.vercel.app"); // ✅ Redirect to frontend
-});
-
 // 🟢 Logout Route
 router.get("/logout", (req, res) => {
   req.logout((err) => {
@@ -60,23 +47,7 @@ router.get("/logout", (req, res) => {
   });
 });
 
-// 🟢 Contact Us Form Submission
-router.post("/contact", async (req, res) => {
-  try {
-    const { name, email, message } = req.body;
-    if (!name || !email || !message) {
-      return res.status(400).json({ message: "❌ All fields are required" });
-    }
-
-    const newMessage = new Contact({ name, email, message });
-    await newMessage.save();
-
-    res.status(200).json({ message: "✅ Message sent successfully!" });
-  } catch (error) {
-    res.status(500).json({ message: "❌ Server error", error });
-  }
-});
-
 module.exports = router;
+
 
 
