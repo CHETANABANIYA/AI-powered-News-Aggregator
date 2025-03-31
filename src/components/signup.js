@@ -9,7 +9,6 @@ export default function Signup() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Load Facebook SDK
     window.fbAsyncInit = function () {
       window.FB.init({
         appId: "1182578409398725",
@@ -28,14 +27,13 @@ export default function Signup() {
       fjs.parentNode.insertBefore(js, fjs);
     })(document, "script", "facebook-jssdk");
 
-    // ✅ Fetch authenticated user on mount
     fetch("https://ai-powered-news-aggregator-backend.onrender.com/api/auth/user", {
       credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data.user) {
-          navigate("/"); // Redirect if already logged in
+        if (data.user || data.token) {
+          navigate("/");
         }
       })
       .catch(() => {});
@@ -66,31 +64,43 @@ export default function Signup() {
 
       if (response.ok) {
         alert("✅ Account created successfully!");
-        navigate("/login");
+        setTimeout(() => navigate("/login"), 500);
+      } else if (response.status === 409) {
+        setError("⚠️ Email is already registered. Try logging in.");
       } else {
         setError(data.message || "Signup failed. Please try again.");
       }
     } catch (err) {
       setLoading(false);
-      setError("Something went wrong. Please try again later.");
+      setError("🚨 Something went wrong. Check your internet connection.");
     }
   };
 
   const handleGoogleSignup = () => {
-    window.location.href = "https://ai-powered-news-aggregator-backend.onrender.com/api/auth/google";
+    const newWindow = window.open(
+      "https://ai-powered-news-aggregator-backend.onrender.com/api/auth/google",
+      "_blank",
+      "width=500,height=600"
+    );
+
+    const checkLogin = setInterval(() => {
+      if (newWindow.closed) {
+        clearInterval(checkLogin);
+        navigate("/login");
+      }
+    }, 1000);
   };
 
   const handleFacebookSignup = () => {
-    window.FB.login(
-      function (response) {
-        if (response.authResponse) {
-          window.location.href = `https://ai-powered-news-aggregator-backend.onrender.com/api/auth/facebook?access_token=${response.authResponse.accessToken}`;
-        } else {
-          setError("Facebook signup failed. Please try again.");
-        }
-      },
-      { scope: "email,public_profile" }
-    );
+    window.FB.login((response) => {
+      if (response.authResponse) {
+        fetch(`https://ai-powered-news-aggregator-backend.onrender.com/api/auth/facebook?access_token=${response.authResponse.accessToken}`)
+          .then(() => navigate("/login"))
+          .catch(() => setError("Facebook signup failed. Try again."));
+      } else {
+        setError("Facebook signup failed. Please try again.");
+      }
+    }, { scope: "email,public_profile" });
   };
 
   return (
@@ -117,5 +127,6 @@ export default function Signup() {
     </div>
   );
 }
+
 
 

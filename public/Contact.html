@@ -4,10 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contact Us - AI-Powered News Aggregator</title>
-  <!-- Google Fonts -->
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&amp;family=Roboto:wght@300;400;500&amp;display=swap" rel="stylesheet">
-  <!-- Bootstrap CSS -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
@@ -16,51 +14,33 @@
       margin: 0;
       padding: 0;
     }
-
     .navbar {
       background: #222;
       padding: 15px 20px;
     }
-
     .navbar-brand {
       font-family: 'Montserrat', sans-serif;
       font-weight: 700;
       font-size: 2rem;
       color: #ff6f61;
     }
-
     .nav-link {
       color: white;
       margin: 0 10px;
       font-weight: 500;
     }
-
     .nav-link:hover {
       color: #ff6f61;
     }
-
     .hero-section {
       background: linear-gradient(135deg, #ff6f61, #feac5e);
       color: white;
       padding: 60px 20px;
       text-align: center;
     }
-
-    .hero-section h1 {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 3rem;
-      font-weight: 700;
-    }
-
-    .hero-section p {
-      font-size: 1.2rem;
-      margin: 20px 0;
-    }
-
     .contact-form {
       padding: 50px 20px;
     }
-
     .contact-form h2 {
       text-align: center;
       margin-bottom: 30px;
@@ -68,16 +48,14 @@
       font-weight: 700;
       color: #333;
     }
-
     .contact-form form {
       max-width: 600px;
       margin: 0 auto;
       background: #fff;
       padding: 30px;
-      border-radius: 10px;
+      border-radius: 15px;
       box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
     }
-
     .contact-form input, .contact-form textarea {
       width: 100%;
       padding: 12px;
@@ -86,43 +64,23 @@
       border: 1px solid #ddd;
       outline: none;
     }
-
-    .contact-form button {
-      padding: 12px 20px;
-      border-radius: 25px;
-      border: none;
-      background: #ff6f61;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
+    .btn-primary {
+      background-color: #ff6f61;
+      border-color: #ff6f61;
     }
-
-    .contact-form button:hover {
+    .btn-primary:hover {
       background: #feac5e;
+      border-color: #feac5e;
     }
-
-    /* Footer */
     .footer {
       background: #222;
       color: white;
       padding: 20px;
       text-align: center;
     }
-
-    .footer a {
-      color: #ff6f61;
-      text-decoration: none;
-    }
-
-    .footer a:hover {
-      text-decoration: underline;
-    }
-
   </style>
 </head>
 <body>
-
-<!-- Navbar -->
   <nav class="navbar navbar-expand-lg">
     <div class="container">
       <a class="navbar-brand" href="#">NewsSphere</a>
@@ -140,13 +98,11 @@
     </div>
   </nav>
 
-  <!-- Hero Section -->
   <section class="hero-section">
     <h1>Contact Us</h1>
     <p>We'd love to hear from you! Feel free to send us your thoughts or questions.</p>
   </section>
 
-  <!-- Contact Form -->
   <section class="contact-form">
     <h2>Get in Touch</h2>
     <form>
@@ -166,42 +122,43 @@
     </form>
   </section>
 
-  <!-- Footer -->
   <footer class="footer">
-    <p>© 2025 NewsSphere | <a href="privacy-policy.html">Privacy Policy</a></p>
+    <p>&copy; 2025 NewsSphere | <a href="privacy-policy.html">Privacy Policy</a></p>
   </footer>
 
-  <!-- Bootstrap JS and dependencies -->
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+  <script>
+    document.querySelector("form").addEventListener("submit", async function (event) {
+      event.preventDefault();
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const message = document.getElementById("message").value.trim();
+
+      if (!name || !email || !message) {
+        alert("⚠️ Please fill in all fields.");
+        return;
+      }
+
+      try {
+        const response = await fetch("https://ai-powered-news-aggregator-backend.onrender.com/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, message }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          alert("✅ Message sent successfully!");
+          document.querySelector("form").reset();
+        } else {
+          alert("❌ Failed to send message: " + (data.error || "Unknown error"));
+        }
+      } catch (error) {
+        alert("❌ Error sending message: " + error.message);
+      }
+    });
+  </script>
 </body>
 </html>
-<script>
-  document.querySelector("form").addEventListener("submit", async function (event) {
-    event.preventDefault(); // Prevent default form submission
 
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const message = document.getElementById("message").value;
-
-    // Send form data to the backend
-    try {
-      const response = await fetch("https://ai-powered-news-aggregator-backend.onrender.com/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, message }),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        alert("✅ Message sent successfully!");
-        document.querySelector("form").reset();
-      } else {
-        alert("❌ Failed to send message: " + data.error);
-      }
-    } catch (error) {
-      alert("❌ Error sending message: " + error.message);
-    }
-  });
-</script>
 
