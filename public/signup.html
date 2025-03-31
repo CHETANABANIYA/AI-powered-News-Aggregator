@@ -1,19 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&amp;family=Roboto:wght@300;400;500&amp;display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Signup | AI-Powered News Aggregator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&amp;family=Roboto:wght@300;400;500&amp;display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
   <style>
-    /* Styles omitted for brevity */
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(to right, #ff7e5f, #feb47b);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .signup-container {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 30px;
+      border-radius: 10px;
+      width: 400px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 0.8s ease-out;
+    }
+    .signup-container h2 {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      color: #333;
+      text-align: center;
+    }
+    .input-group {
+      position: relative;
+    }
+    .signup-container input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 25px;
+      border: 1px solid #ddd;
+      margin-bottom: 15px;
+      font-size: 1rem;
+    }
+    .eye-icon {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+    }
+    .signup-container button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 25px;
+      border: none;
+      background: #ff6f61;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-google, .btn-facebook {
+      width: 100%;
+      padding: 12px;
+      border-radius: 25px;
+      margin-bottom: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+    }
+    .btn-google { background-color: #db4437; color: white; }
+    .btn-facebook { background-color: #3b5998; color: white; }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
   </style>
 </head>
 <body>
-
-  <!-- Signup Form -->
   <div class="signup-container">
     <h2>Create Your Account</h2>
     <form id="signup-form">
@@ -25,94 +88,34 @@
       </div>
       <button type="submit">Sign Up</button>
     </form>
-
-    <div id="loading" style="display: none;">
-      <i class="fas fa-spinner fa-spin"></i> Creating your account...
-    </div>
-
     <p class="footer">Already have an account? <a href="login.html">Login</a></p>
-
-    <!-- Social Media Signup -->
-    <button class="btn-google"><i class="fab fa-google"></i> Sign Up with Google</button>
-    <button class="btn-facebook"><i class="fab fa-facebook-f"></i> Sign Up with Facebook</button>
+    <button class="btn-google" onclick="googleLogin()">Sign Up with Google</button>
+    <button class="btn-facebook" onclick="facebookLogin()">Sign Up with Facebook</button>
   </div>
-
-  <!-- Bootstrap JS and dependencies -->
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
-  <script src="js/signup.js"></script>
-
+  
   <script>
-    // Toggle password visibility
     function togglePassword() {
-      var password = document.getElementById("password");
-      var eyeIcon = document.querySelector(".eye-icon");
-
-      if (password.type === "password") {
-        password.type = "text";
-        eyeIcon.classList.remove("fa-eye");
-        eyeIcon.classList.add("fa-eye-slash");
-      } else {
-        password.type = "password";
-        eyeIcon.classList.remove("fa-eye-slash");
-        eyeIcon.classList.add("fa-eye");
-      }
+      const password = document.getElementById("password");
+      const eyeIcon = document.querySelector(".eye-icon");
+      password.type = password.type === "password" ? "text" : "password";
+      eyeIcon.classList.toggle("fa-eye");
+      eyeIcon.classList.toggle("fa-eye-slash");
     }
-
-    // Signup form submission
+    
     document.getElementById("signup-form").addEventListener("submit", async function (event) {
       event.preventDefault();
-
-      const nameInput = document.getElementById("name");
-      const emailInput = document.getElementById("email");
-      const passwordInput = document.getElementById("password");
-      const submitBtn = event.target.querySelector("button");
-      const loading = document.getElementById("loading");
-
-      let isValid = true;
-
-      // Clear previous errors
-      clearError(nameInput);
-      clearError(emailInput);
-      clearError(passwordInput);
-
-      if (nameInput.value.trim() === "") {
-        showError(nameInput, "Name is required");
-        isValid = false;
-      }
-
-      if (!validateEmail(emailInput.value)) {
-        showError(emailInput, "Invalid email format");
-        isValid = false;
-      }
-
-      if (!validatePassword(passwordInput.value)) {
-        showError(passwordInput, "Password must be at least 8 characters, include an uppercase letter, a number, and a special character");
-        isValid = false;
-      }
-
-      if (!isValid) return;
-
-      // Disable button and show loading
-      submitBtn.disabled = true;
-      loading.style.display = "block";
-
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
       try {
         const response = await fetch("https://ai-powered-news-aggregator-backend.onrender.com/api/signup", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: nameInput.value,
-            email: emailInput.value,
-            password: passwordInput.value,
-          }),
+          body: JSON.stringify({ name, email, password }),
         });
-
         const data = await response.json();
-
         if (response.ok) {
-          localStorage.setItem("signupSuccess", "true");
+          sessionStorage.setItem("isLoggedIn", "true");
           window.location.href = "login.html";
         } else {
           alert(`❌ Signup failed: ${data.message}`);
@@ -120,48 +123,15 @@
       } catch (error) {
         alert("❌ Error signing up. Please try again.");
       }
-
-      // Re-enable button and hide loading
-      submitBtn.disabled = false;
-      loading.style.display = "none";
     });
-
-    // Helper functions for error handling
-    function showError(input, message) {
-      let error = input.nextElementSibling;
-      if (!error || !error.classList.contains("error-message")) {
-        error = document.createElement("div");
-        error.className = "error-message";
-        input.parentNode.appendChild(error);
-      }
-      error.textContent = message;
-      input.style.borderColor = "red";
-    }
-
-    function clearError(input) {
-      let error = input.nextElementSibling;
-      if (error && error.classList.contains("error-message")) {
-        error.remove();
-      }
-      input.style.borderColor = "#ddd";
-    }
-
-    function validateEmail(email) {
-      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return regex.test(email);
-    }
-
-    function validatePassword(password) {
-      return password.length >= 8 && /[A-Z]/.test(password) && /\d/.test(password) && /[^A-Za-z0-9]/.test(password);
-    }
-
-    // Show success message on login page if redirected after signup
-    if (localStorage.getItem("signupSuccess")) {
-      alert("✅ Account created successfully! You can now log in.");
-      localStorage.removeItem("signupSuccess");
-    }
+    
+    function googleLogin() { alert("Google login not implemented yet."); }
+    function facebookLogin() { alert("Facebook login not implemented yet."); }
   </script>
+
 </body>
 </html>
+
+
 
 
