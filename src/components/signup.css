@@ -1,0 +1,133 @@
+/* signup.css */
+
+/* General Styles */
+body {
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(to right, #ff7e5f, #feb47b);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.signup-container {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 30px;
+  border-radius: 10px;
+  width: 400px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+  transform: translateY(100%);
+  animation: slideUp 0.8s ease-out forwards;
+}
+
+.signup-container h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.input-group {
+  position: relative;
+}
+
+.signup-container input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 25px;
+  border: 1px solid #ddd;
+  outline: none;
+  margin-bottom: 15px;
+  font-size: 1rem;
+}
+
+.signup-container input:focus {
+  border-color: #ff6f61;
+  box-shadow: 0 0 5px rgba(255, 111, 97, 0.5);
+}
+
+.eye-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.signup-container button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 25px;
+  border: none;
+  background: #ff6f61;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.signup-container button:hover {
+  background: #feac5e;
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.footer {
+  text-align: center;
+  margin-top: 20px;
+  color: #333;
+}
+
+.footer a {
+  color: #ff6f61;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+.btn-google, .btn-facebook {
+  width: 100%;
+  padding: 12px;
+  border-radius: 25px;
+  margin-bottom: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+
+.btn-google {
+  background-color: #db4437;
+}
+
+.btn-facebook {
+  background-color: #3b5998;
+}
+
+.btn-google:hover, .btn-facebook:hover {
+  opacity: 0.9;
+}
+
+.spinner-border {
+  color: #ff6f61;
+}
+
+#loading {
+  display: none;
+  text-align: center;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+
