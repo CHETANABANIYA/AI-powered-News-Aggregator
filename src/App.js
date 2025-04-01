@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Welcome from "./components/Welcome"; // New Welcome Page
+import Welcome from "./components/Welcome";
 import Signup from "./components/Signup";
 import Login from "./components/Login";
 import Home from "./components/Home";
@@ -42,6 +42,7 @@ function App() {
 }
 
 export default App;
+
 
 
 
