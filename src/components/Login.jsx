@@ -20,7 +20,8 @@ export default function Login() {
     };
 
     (function (d, s, id) {
-      let js, fjs = d.getElementsByTagName(s)[0];
+      let js,
+        fjs = d.getElementsByTagName(s)[0];
       if (d.getElementById(id)) return;
       js = d.createElement(s);
       js.id = id;
@@ -120,6 +121,5 @@ export default function Login() {
     </div>
   );
 }
-
 
 
