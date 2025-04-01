@@ -6,14 +6,10 @@ export default function Welcome() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("Welcome Page Rendered"); // Debugging
-
     const isLoggedIn = sessionStorage.getItem("isLoggedIn");
-    console.log("isLoggedIn status:", isLoggedIn); // Debugging
 
     if (isLoggedIn === "true") {
-      console.log("User is logged in. Redirecting to /index...");
-      navigate("/index");
+      navigate("/index"); // Redirect to the index page if logged in
     }
   }, [navigate]);
 
@@ -28,6 +24,7 @@ export default function Welcome() {
     </div>
   );
 }
+
 
 
 
