@@ -59,6 +59,10 @@ export default function Login() {
     setLoading(false);
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = "https://ai-powered-news-aggregator-backend.onrender.com/api/auth/google";
+  };
+
   return (
     <div className="login-container">
       <h2>Login to NewsSphere</h2>
@@ -67,6 +71,11 @@ export default function Login() {
         <input type="password" name="password" placeholder="Enter your password" required />
         <button type="submit">{loading ? "Logging in..." : "Login"}</button>
       </form>
+
+      {error && <div className="error-message">{error}</div>}
+
+      {/* Google Login Button (inside the return statement) */}
+      <button onClick={handleGoogleLogin} className="btn-google">Login with Google</button>
     </div>
   );
 }
