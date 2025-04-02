@@ -36,6 +36,8 @@
     "react-scripts": "^5.0.1",
     "redis": "^4.7.0",
     "serve": "^14.2.0"
+    "jsonwebtoken": "^9.0.2"
+
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",

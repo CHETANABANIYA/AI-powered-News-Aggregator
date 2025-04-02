@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkai_news_aggregator=self.webpackChunkai_news_aggregator||[]).push([[421],{421:(e,a,s)=>{s.r(a),s.d(a,{default:()=>g});const g={}}}]);
-//# sourceMappingURL=421.69397afb.chunk.js.map
