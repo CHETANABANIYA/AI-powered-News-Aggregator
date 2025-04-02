@@ -685,14 +685,7 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchAllNews();
 });
 </script>
-<script>
-    window.onload = function() {
-        const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-        if (!isLoggedIn) {
-            window.location.href = 'login.html'; // Redirect to login page if not logged in
-        }
-    };
-</script>
+
 <script src="script.js"></script>
 </body>
 </html>
