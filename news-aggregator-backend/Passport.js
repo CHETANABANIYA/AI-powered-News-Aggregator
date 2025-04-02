@@ -23,17 +23,22 @@ passport.deserializeUser(async (id, done) => {
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "https://ai-powered-news-aggregator-backend.onrender.com/api/auth/google/callback"
+    callbackURL: "https://ai-powered-news-aggregator-backend.onrender.com/api/auth/google/callback",
+    scope: ["profile", "email"] // Ensure "email" is included
 }, async (accessToken, refreshToken, profile, done) => {
     try {
-        let user = await User.findOne({ email: profile.emails[0].value });
+        const email = profile.emails?.[0]?.value; // Get email safely
+
+        if (!email) return done(new Error("No email returned from Google"), null);
+
+        let user = await User.findOne({ email });
 
         if (!user) {
             user = new User({
                 name: profile.displayName,
-                email: profile.emails[0].value,
-                password: "", // No password for OAuth users
-                photo: profile.photos ? profile.photos[0].value : null
+                email,
+                password: "", // OAuth users don't have passwords
+                photo: profile.photos?.[0]?.value || null
             });
             await user.save();
         }
@@ -43,7 +48,8 @@ passport.use(new GoogleStrategy({
     }
 }));
 
-// ✅ Facebook OAuth Strategy (Works fine)
+
+// ✅ Facebook OAuth Strategy (Enhanced for missing emails)
 passport.use(new FacebookStrategy({
     clientID: process.env.FACEBOOK_APP_ID,
     clientSecret: process.env.FACEBOOK_APP_SECRET,
@@ -51,24 +57,21 @@ passport.use(new FacebookStrategy({
     profileFields: ["id", "displayName", "photos", "email"]
 }, async (accessToken, refreshToken, profile, done) => {
     try {
-        let user = await User.findOne({ email: profile.emails[0].value });
-
-        if (!user) {
-            user = new User({
-                name: profile.displayName,
-                email: profile.emails[0].value,
-                password: "",
-                photo: profile.photos ? profile.photos[0].value : null
-            });
-            await user.save();
-        }
+        let userEmail = profile.emails && profile.emails[0] ? profile.emails[0].value : `facebook_${profile.id}@noemail.com`;
+        let user = await User.findOneAndUpdate(
+            { email: userEmail },
+            { $setOnInsert: { name: profile.displayName, photo: profile.photos[0]?.value || null, password: "" } },
+            { new: true, upsert: true }
+        );
         return done(null, user);
     } catch (error) {
+        console.error("❌ Facebook OAuth Error:", error);
         return done(error, null);
     }
 }));
 
 module.exports = passport;
+
 
 
 
