@@ -8,8 +8,8 @@ const ContactSchema = new mongoose.Schema({
 
 const Contact = mongoose.model("Contact", ContactSchema);
 
-// ✅ Default export to fix the issue
-export default Contact;
+export default Contact;  // ✅ Ensure this export is present
+
 
 
 
