@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Welcome from "./components/Welcome";
 import Signup from "./components/Signup";
 import Login from "./components/Login";
@@ -15,19 +15,15 @@ const isAuthenticated = () => !!localStorage.getItem("token");
 
 function App() {
   return (
-    <Router> {/* ✅ Single Router at the root level */}
-      <Routes>
-        <Route path="/" element={<Welcome />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
-        <Route
-          path="/index"
-          element={
-            isAuthenticated() ? <MainHomePage /> : <Navigate to="/login" replace />
-          }
-        />
-      </Routes>
-    </Router>
+    <Routes>
+      <Route path="/" element={<Welcome />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/login" element={<Login />} />
+      <Route
+        path="/index"
+        element={isAuthenticated() ? <MainHomePage /> : <Navigate to="/login" replace />}
+      />
+    </Routes>
   );
 }
 
@@ -44,6 +40,7 @@ const MainHomePage = () => (
 );
 
 export default App;
+
 
 
 

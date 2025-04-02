@@ -56,6 +56,13 @@ const ContactMessage = mongoose.model("ContactMessage", contactMessageSchema);
 // ✅ Mailchimp Config
 mailchimp.setConfig({ apiKey: MAILCHIMP_API_KEY, server: "us11" });
 
+// ✅ CORS Middleware (Allow frontend requests)
+app.use(cors({
+  origin: "https://ai-powered-news-aggregator.vercel.app", // ✅ Allow only your frontend
+  methods: "GET,POST,PUT,DELETE",
+  credentials: true
+}));
+
 // ✅ Redis Setup
 const redisClient = createClient({ url: REDIS_URL });
 

@@ -46,27 +46,30 @@ export default function Login() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
+        credentials: "include", // ✅ Ensures cookies are stored
       });
 
       const data = await response.json();
 
-      if (response.ok) {
-        localStorage.setItem("token", data.token); // ✅ Store token
-        alert("✅ Login Successful!");
-        navigate("/index"); // ✅ Redirect to home page
-      } else {
-        setError(data.message || "Invalid credentials.");
+      if (!response.ok) {
+        throw new Error(data.message || "Invalid credentials.");
       }
+
+      localStorage.setItem("token", data.token); // ✅ Store token for authentication
+      localStorage.setItem("user", JSON.stringify(data.user)); // ✅ Store user info
+      alert("✅ Login Successful!");
+      navigate("/index"); // ✅ Redirect to homepage after login
+
     } catch (err) {
-      setError("Something went wrong. Please try again later.");
+      setError(err.message || "Something went wrong. Please try again.");
     }
 
     setLoading(false);
   };
 
   const handleGoogleLogin = () => {
-  window.location.href = "https://ai-powered-news-aggregator-backend.onrender.com/api/auth/google";
-};
+    window.location.href = "https://ai-powered-news-aggregator-backend.onrender.com/api/auth/google";
+  };
 
   return (
     <div className="login-container">
@@ -91,6 +94,7 @@ export default function Login() {
     </div>
   );
 }
+
 
 
 

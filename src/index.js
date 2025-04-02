@@ -1,8 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./index.css";
-import App from "./App";
 import { BrowserRouter } from "react-router-dom"; 
+import App from "./App";
+import "./index.css";
 
 // Import Bootstrap with error handling
 try {
@@ -17,14 +17,15 @@ const rootElement = document.getElementById("root");
 if (!rootElement) {
   console.error("❌ Root element with id 'root' not found in index.html");
 } else {
-  // Create React root & render App
+  // Create React root & render App inside a single BrowserRouter
   const root = ReactDOM.createRoot(rootElement);
   root.render(
-    <BrowserRouter>   {/* BrowserRouter is placed here */}
+    <BrowserRouter>
       <App />
     </BrowserRouter>
   );
 }
+
 
 
 
