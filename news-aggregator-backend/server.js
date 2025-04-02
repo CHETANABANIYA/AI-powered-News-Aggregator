@@ -245,6 +245,131 @@ app.post("/api/contact", async (req, res) => {
   }
 });
 
+// ✅ login Route (Manual Signup)
+app.post("/api/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ error: "User not found" });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ error: "Invalid credentials" });
+
+    const token = generateToken(user.email);
+    res.json({ message: "Login successful!", token });
+  } catch (error) {
+    console.error("❌ Login Error:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// ✅ Signup Route (Manual Signup)
+app.post("/api/signup", async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: "User already exists" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({ name, email, password: hashedPassword });
+    await newUser.save();
+
+    res.json({ message: "Signup successful! Please login." });
+  } catch (error) {
+    console.error("❌ Signup Error:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// ✅ Google OAuth Strategy
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: "/api/auth/google/callback",
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        let user = await User.findOne({ email: profile.emails[0].value });
+        if (!user) {
+          user = new User({ 
+            name: profile.displayName, 
+            email: profile.emails[0].value,
+            password: "", // No password for OAuth users
+          });
+          await user.save();
+        }
+        return done(null, user);
+      } catch (error) {
+        return done(error, null);
+      }
+    }
+  )
+);
+
+// ✅ Facebook OAuth Strategy
+passport.use(
+  new FacebookStrategy(
+    {
+      clientID: process.env.FACEBOOK_CLIENT_ID,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+      callbackURL: "/api/auth/facebook/callback",
+      profileFields: ["id", "displayName", "emails"],
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        let user = await User.findOne({ email: profile.emails[0].value });
+        if (!user) {
+          user = new User({ 
+            name: profile.displayName, 
+            email: profile.emails[0].value,
+            password: "",
+          });
+          await user.save();
+        }
+        return done(null, user);
+      } catch (error) {
+        return done(error, null);
+      }
+    }
+  )
+);
+
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((obj, done) => done(null, obj));
+
+// ✅ Google Auth Routes
+app.get("/api/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+app.get("/api/auth/google/callback", passport.authenticate("google", {
+  failureRedirect: "/login",
+}), (req, res) => {
+  res.redirect("https://ai-powered-news-aggregator.vercel.app");
+});
+
+// ✅ Facebook Auth Routes
+app.get("/api/auth/facebook", passport.authenticate("facebook", { scope: ["email"] }));
+app.get("/api/auth/facebook/callback", passport.authenticate("facebook", {
+  failureRedirect: "/login",
+}), (req, res) => {
+  res.redirect("https://ai-powered-news-aggregator.vercel.app");
+});
+
+// ✅ Define User Model
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: { type: String, unique: true },
+  password: String,
+  createdAt: { type: Date, default: Date.now },
+});
+const User = mongoose.model("User", userSchema);
+
 // ✅ Start Server
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 
