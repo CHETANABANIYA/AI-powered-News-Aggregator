@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css"> <!-- External Stylesheet -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login | AI-Powered News Aggregator</title>
+  
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css"> <!-- External Stylesheet -->
+
   <style>
     body {
       font-family: 'Roboto', sans-serif;
-      background: linear-gradient(to right, #ff7e5f, #feb47b); /* Gradient Background */
+      background: linear-gradient(to right, #ff7e5f, #feb47b);
       height: 100vh;
       display: flex;
       justify-content: center;
@@ -33,127 +33,49 @@
       font-family: 'Montserrat', sans-serif;
       font-weight: 700;
       color: #333;
-      margin-bottom: 20px;
       text-align: center;
     }
 
-    .login-container input {
+    .password-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .password-container input {
       width: 100%;
       padding: 12px;
       border-radius: 25px;
       border: 1px solid #ddd;
-      outline: none;
-      margin-bottom: 15px;
       font-size: 1rem;
     }
 
-    .login-container input:focus {
-      border-color: #ff6f61;
-      box-shadow: 0 0 5px rgba(255, 111, 97, 0.5);
-    }
-
-    .login-container button {
-      width: 100%;
-      padding: 12px;
-      border-radius: 25px;
-      border: none;
-      background: #ff6f61;
-      color: white;
-      font-weight: bold;
+    .eye-icon {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
       cursor: pointer;
     }
 
-    .login-container button:hover {
-      background: #feac5e;
-    }
-
-    @keyframes slideUp {
-      0% {
-        transform: translateY(100%);
-      }
-      100% {
-        transform: translateY(0);
-      }
-    }
-
-    .footer {
-      text-align: center;
-      margin-top: 20px;
-      color: #333;
-    }
-
-    .footer a {
-      color: #ff6f61;
-      text-decoration: none;
-    }
-
-    .footer a:hover {
-      text-decoration: underline;
-    }
-
-    /* Social Media Buttons */
-    .btn-google {
-      background-color: #db4437;
-      color: white;
+    .btn-google, .btn-facebook {
       width: 100%;
       padding: 12px;
       border-radius: 25px;
       margin-bottom: 10px;
       font-weight: bold;
-      cursor: pointer;
       display: flex;
       justify-content: center;
       align-items: center;
+      color: white;
+      cursor: pointer;
+    }
+
+    .btn-google {
+      background-color: #db4437;
     }
 
     .btn-facebook {
       background-color: #3b5998;
-      color: white;
-      width: 10%;
-      padding: 12px;
-      border-radius: 25px;
-      margin-bottom: 10px;
-      font-weight: bold;
-      cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .error-message {
-      color: #ff6f61;
-      font-weight: bold;
-      text-align: center;
-      margin-top: 10px;
-      display: none;
-    }
-
-    .spinner-border {
-      color: #ff6f61;
-    }
-
-    input::placeholder {
-      animation: placeholder-fade 2s ease-in-out infinite;
-    }
-
-    @keyframes placeholder-fade {
-      0% {
-        opacity: 0;
-      }
-      50% {
-        opacity: 1;
-      }
-      100% {
-        opacity: 0;
-      }
-    }
-
-    /* Eye Icon to Toggle Password Visibility */
-    .eye-icon {
-      position: absolute;
-      right: 45px;
-      top: 41%;
-      cursor: pointer;
     }
 
     button[type="submit"] {
@@ -165,62 +87,49 @@
       font-weight: bold;
       cursor: pointer;
       transition: all 0.3s ease;
+      width: 100%;
     }
 
     button[type="submit"]:hover {
       background-color: #feac5e;
       transform: scale(1.05);
     }
-
   </style>
 </head>
 <body>
 
-  <!-- Login Form -->
   <div class="login-container">
     <h2>Login to NewsSphere</h2>
     <form id="login-form">
       <input type="email" id="email" placeholder="Enter your email" required>
-      <input type="password" id="password" placeholder="Enter your password" required>
-      <i class="fas fa-eye eye-icon" onclick="togglePassword()"></i>
+
+      <div class="password-container">
+        <input type="password" id="password" placeholder="Enter your password" required>
+        <i class="fas fa-eye eye-icon" onclick="togglePassword()"></i>
+      </div>
+
       <button type="submit">Login</button>
     </form>
 
-    <div id="loading" style="display: none; text-align: center;">
-      <i class="fas fa-spinner fa-spin"></i> Logging in...
-    </div>
-
-    <div class="error-message" id="error-message">
+    <div class="error-message" id="error-message" style="color: red; text-align: center; display: none;">
       Invalid username or password.
     </div>
 
     <p class="footer">Don't have an account? <a href="signup.html">Sign Up</a></p>
 
-    <!-- Social Media Login -->
-    <div class="social-login">
-     <button class="btn-google" id="google-login">
-       <i class="fab fa-google"></i> Login with Google
-       </button>
-       <button class="btn-facebook" id="facebook-login">
-        <i class="fab fa-facebook-f"></i> Login with Facebook
-        </button>
+    <button class="btn-google" id="google-login">
+      <i class="fab fa-google"></i> Login with Google
+    </button>
+    <button class="btn-facebook" id="facebook-login">
+      <i class="fab fa-facebook-f"></i> Login with Facebook
+    </button>
   </div>
 
-  <!-- Bootstrap JS and dependencies -->
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
-  <script src="js/main.js"></script> <!-- External JavaScript -->
-
-  <!-- Font Awesome -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
-
   <script>
     function togglePassword() {
       const password = document.getElementById("password");
-      const eyeIcon = document.querySelector(".eye-icon");
       password.type = password.type === "password" ? "text" : "password";
-      eyeIcon.classList.toggle("fa-eye");
-      eyeIcon.classList.toggle("fa-eye-slash");
     }
 
     document.getElementById("login-form").addEventListener("submit", async function (event) {
@@ -243,10 +152,10 @@
           localStorage.setItem("token", data.token);
           window.location.href = "index.html";
         } else {
-          alert(`❌ Login failed: ${data.message}`);
+          document.getElementById("error-message").style.display = "block";
         }
       } catch (error) {
-        alert("❌ Error logging in. Please try again.");
+        alert("Error logging in. Please try again.");
       }
     });
 
@@ -261,5 +170,6 @@
 
 </body>
 </html>
+
 
 

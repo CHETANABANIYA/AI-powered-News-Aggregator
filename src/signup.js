@@ -41,9 +41,7 @@ export default function Signup() {
       .catch(() => {});
   }, [navigate]);
 
-  const togglePassword = () => {
-    setShowPassword(!showPassword);
-  };
+  const togglePassword = () => setShowPassword(!showPassword);
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -63,7 +61,6 @@ export default function Signup() {
 
       const data = await response.json();
       setLoading(false);
-
       if (response.ok) {
         alert("✅ Account created successfully!");
         navigate("/login");
@@ -82,7 +79,7 @@ export default function Signup() {
 
   const handleFacebookSignup = () => {
     window.FB.login(
-      function (response) {
+      (response) => {
         if (response.authResponse) {
           window.location.href = `https://ai-powered-news-aggregator-backend.onrender.com/api/auth/facebook?access_token=${response.authResponse.accessToken}`;
         } else {
@@ -99,24 +96,22 @@ export default function Signup() {
       <form onSubmit={handleSignup}>
         <input type="text" name="name" placeholder="Full Name" required />
         <input type="email" name="email" placeholder="Email Address" required />
-
         <div className="password-container">
           <input type={showPassword ? "text" : "password"} name="password" placeholder="Password" required />
           <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"} eye-icon`} onClick={togglePassword}></i>
         </div>
-
         <button type="submit" disabled={loading}>
           {loading ? <i className="fas fa-spinner fa-spin"></i> : "Sign Up"}
         </button>
       </form>
-
       {error && <div className="error-message">{error}</div>}
-
       <button className="btn-google" onClick={handleGoogleSignup}>Sign Up with Google</button>
       <button className="btn-facebook" onClick={handleFacebookSignup}>Sign Up with Facebook</button>
     </div>
   );
 }
+
+
 
 
 

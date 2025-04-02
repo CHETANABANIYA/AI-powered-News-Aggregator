@@ -370,6 +370,18 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model("User", userSchema);
 
+app.get('/api/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+app.get('/api/auth/google/callback', passport.authenticate('google', {
+  successRedirect: '/dashboard',
+  failureRedirect: '/login'
+}));
+
+app.get('/api/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+app.get('/api/auth/facebook/callback', passport.authenticate('facebook', {
+  successRedirect: '/dashboard',
+  failureRedirect: '/login'
+}));
+
 // ✅ Start Server
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 
