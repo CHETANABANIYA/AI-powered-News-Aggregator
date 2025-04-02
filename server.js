@@ -84,6 +84,14 @@ app.use(
 
 app.use(express.json());
 
+// ✅ Apply Rate Limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests
+  message: { error: "Too many requests, please try again later." },
+});
+app.use(limiter);
+
 // ✅ Session & Passport Setup
 app.use(
   session({
@@ -199,7 +207,7 @@ app.get("/api/news/search", async (req, res) => {
 });
 
 // ✅ Mailchimp Subscription Route
-app.post("/api/subscribe", async (req, res, next) => {
+app.post("/api/subscribe", async (req, res) => {
   try {
     const { email } = req.body;
     if (!email || !email.includes("@")) return res.status(400).json({ error: "Invalid email address" });
@@ -207,7 +215,11 @@ app.post("/api/subscribe", async (req, res, next) => {
     await mailchimp.lists.addListMember(MAILCHIMP_LIST_ID, { email_address: email, status: "subscribed" });
     res.json({ message: "Successfully subscribed!" });
   } catch (error) {
-    next(error);
+    if (error.response?.body?.title === "Member Exists") {
+      return res.status(400).json({ error: "Email is already subscribed" });
+    }
+    console.error("❌ Mailchimp Error:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 

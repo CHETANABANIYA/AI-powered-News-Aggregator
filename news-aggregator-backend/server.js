@@ -3,16 +3,16 @@ import express from "express";
 import mongoose from "mongoose";
 import axios from "axios";
 import cors from "cors";
-import session from "express-session";
-import { createClient } from "redis";
-import connectRedis from "connect-redis";
- // ✅ Fix: Use named import
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import rateLimit from "express-rate-limit";
+import mailchimp from "@mailchimp/mailchimp_marketing";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as FacebookStrategy } from "passport-facebook";
-import mailchimp from "@mailchimp/mailchimp_marketing";
+import session from "express-session";
+import RedisStore from "connect-redis";
+import { createClient } from "redis";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 // Load environment variables
 dotenv.config();
@@ -20,7 +20,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 app.set("trust proxy", 1);
 
-// Validate Required Environment Variables
+// ✅ Validate Required Environment Variables
 const requiredEnvVars = [
   "NEWSAPI_KEY", "GNEWS_API_KEY", "MAILCHIMP_API_KEY", "MAILCHIMP_LIST_ID",
   "REDIS_URL", "SESSION_SECRET", "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET",
@@ -34,22 +34,14 @@ requiredEnvVars.forEach((key) => {
   }
 });
 
-// Extract Environment Variables
+// ✅ API Keys & Configurations
 const {
   NEWSAPI_KEY, GNEWS_API_KEY, MAILCHIMP_API_KEY, MAILCHIMP_LIST_ID,
   REDIS_URL, SESSION_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET,
   FACEBOOK_CLIENT_ID, FACEBOOK_CLIENT_SECRET, JWT_SECRET, MONGO_URI
 } = process.env;
 
-// MongoDB Connection
-mongoose.connect(MONGO_URI)
-  .then(() => console.log("✅ Connected to MongoDB"))
-  .catch((err) => {
-    console.error("❌ MongoDB Connection Error:", err.message);
-    process.exit(1);
-  });
-
-// Define ContactMessage Model
+// ✅ Define ContactMessage Model
 const contactMessageSchema = new mongoose.Schema({
   name: String,
   email: String,
@@ -58,7 +50,10 @@ const contactMessageSchema = new mongoose.Schema({
 });
 const ContactMessage = mongoose.model("ContactMessage", contactMessageSchema);
 
-// Redis Client Setup
+// ✅ Mailchimp Config
+mailchimp.setConfig({ apiKey: MAILCHIMP_API_KEY, server: "us11" });
+
+// ✅ Redis Setup
 const redisClient = createClient({ url: REDIS_URL });
 
 redisClient.on("error", (err) => console.error(`❌ Redis Error: ${err.message}`));
@@ -69,23 +64,10 @@ redisClient.on("error", (err) => console.error(`❌ Redis Error: ${err.message}`
     console.log("✅ Connected to Redis");
   } catch (error) {
     console.error("❌ Redis Connection Error:", error.message);
-    process.exit(1);
   }
 })();
 
-// Redis Session Store
-const RedisStore = connectRedis(session); // ✅ Fix: Correct usage
-app.use(
-  session({
-    store: new RedisStore({ client: redisClient, prefix: "sess:" }),
-    secret: SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: process.env.NODE_ENV === "production", httpOnly: true },
-  })
-);
-
-// CORS Configuration
+// ✅ CORS Configuration
 const allowedOrigins = [
   "http://localhost:3000",
   "https://ai-powered-news-aggregator.vercel.app"
@@ -102,30 +84,66 @@ app.use(
 
 app.use(express.json());
 
-// Mailchimp Configuration
-mailchimp.setConfig({ apiKey: MAILCHIMP_API_KEY, server: MAILCHIMP_API_KEY.split("-")[1] });
+// ✅ Apply Rate Limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests
+  message: { error: "Too many requests, please try again later." },
+});
+app.use(limiter);
 
-// Passport Setup
+// ✅ Session & Passport Setup
+app.use(
+  session({
+    store: new RedisStore({ client: redisClient }),
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true
+    }
+  })
+);
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new GoogleStrategy(
-  { clientID: GOOGLE_CLIENT_ID, clientSecret: GOOGLE_CLIENT_SECRET, callbackURL: "/api/auth/google/callback" },
-  (accessToken, refreshToken, profile, done) => done(null, profile)
-));
+// ✅ Middleware Setup
+app.use(cors());
+app.use(express.json());
 
-passport.use(new FacebookStrategy(
-  { clientID: FACEBOOK_CLIENT_ID, clientSecret: FACEBOOK_CLIENT_SECRET, callbackURL: "/api/auth/facebook/callback", profileFields: ["id", "displayName", "photos", "email"] },
-  (accessToken, refreshToken, profile, done) => done(null, profile)
-));
+// ✅ Google OAuth Strategy
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
+      callbackURL: "/api/auth/google/callback",
+    },
+    (accessToken, refreshToken, profile, done) => done(null, profile)
+  )
+);
+
+// ✅ Facebook OAuth Strategy
+passport.use(
+  new FacebookStrategy(
+    {
+      clientID: FACEBOOK_CLIENT_ID,
+      clientSecret: FACEBOOK_CLIENT_SECRET,
+      callbackURL: "/api/auth/facebook/callback",
+      profileFields: ["id", "displayName", "photos", "email"],
+    },
+    (accessToken, refreshToken, profile, done) => done(null, profile)
+  )
+);
 
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
 
-// Generate JWT Token
-const generateToken = (email) => jwt.sign({ email }, JWT_SECRET, { expiresIn: process.env.JWT_EXPIRY || "7d" });
+// ✅ Generate JWT Token
+const generateToken = (email) => jwt.sign({ email }, JWT_SECRET, { expiresIn: "7d" });
 
-// Fetch News from APIs
+// ✅ Fetch News from APIs
 const fetchNewsFromAPIs = async (category, country, language) => {
   try {
     const newsAPIResponse = await axios.get(
@@ -133,7 +151,7 @@ const fetchNewsFromAPIs = async (category, country, language) => {
     );
     if (newsAPIResponse.data?.articles?.length > 0) return newsAPIResponse.data;
   } catch (error) {
-    console.error("❌ NewsAPI Error:", error.response?.data || error.message);
+    console.error("❌ NewsAPI Error:", error.message);
   }
   try {
     const gnewsResponse = await axios.get(
@@ -141,12 +159,12 @@ const fetchNewsFromAPIs = async (category, country, language) => {
     );
     if (gnewsResponse.data?.articles?.length > 0) return gnewsResponse.data;
   } catch (error) {
-    console.error("❌ GNews Error:", error.response?.data || error.message);
+    console.error("❌ GNews Error:", error.message);
   }
   return { articles: [] };
 };
 
-// News Route with Caching
+// ✅ News Route with Caching
 app.get("/api/news", async (req, res, next) => {
   try {
     const { category = "general", country = "us", language = "en" } = req.query;
@@ -164,17 +182,16 @@ app.get("/api/news", async (req, res, next) => {
   }
 });
 
-// Search News Route
+// ✅ Search News Route
 app.get("/api/news/search", async (req, res) => {
   const query = req.query.query;
   if (!query) return res.status(400).json({ error: "Missing query parameter" });
-
   let results = { articles: [] };
   try {
     const newsAPIResponse = await axios.get(
       `https://newsapi.org/v2/everything?q=${query}&language=en&apiKey=${NEWSAPI_KEY}`
     );
-    if (newsAPIResponse.data?.articles?.length > 0) results.articles.push(...newsAPIResponse.data.articles);
+    if (newsAPIResponse.data?.articles?.length > 0) results.articles = [...newsAPIResponse.data.articles];
   } catch (error) {
     console.error("❌ NewsAPI Search Error:", error.response?.data || error.message);
   }
@@ -182,15 +199,15 @@ app.get("/api/news/search", async (req, res) => {
     const gnewsResponse = await axios.get(
       `https://gnews.io/api/v4/search?q=${query}&lang=en&apikey=${GNEWS_API_KEY}`
     );
-    if (gnewsResponse.data?.articles?.length > 0) results.articles.push(...gnewsResponse.data.articles);
+    if (gnewsResponse.data?.articles?.length > 0) results.articles = [...results.articles, ...gnewsResponse.data.articles];
   } catch (error) {
     console.error("❌ GNews Search Error:", error.response?.data || error.message);
   }
   res.json(results);
 });
 
-// Mailchimp Subscription Route
-app.post("/api/subscribe", async (req, res, next) => {
+// ✅ Mailchimp Subscription Route
+app.post("/api/subscribe", async (req, res) => {
   try {
     const { email } = req.body;
     if (!email || !email.includes("@")) return res.status(400).json({ error: "Invalid email address" });
@@ -198,11 +215,37 @@ app.post("/api/subscribe", async (req, res, next) => {
     await mailchimp.lists.addListMember(MAILCHIMP_LIST_ID, { email_address: email, status: "subscribed" });
     res.json({ message: "Successfully subscribed!" });
   } catch (error) {
-    next(error);
+    if (error.response?.body?.title === "Member Exists") {
+      return res.status(400).json({ error: "Email is already subscribed" });
+    }
+    console.error("❌ Mailchimp Error:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-// Start Server
+// ✅ Error Handling Middleware
+app.use((err, req, res, next) => {
+  console.error("❌ Server Error:", err.message);
+  res.status(500).json({ error: "Internal Server Error" });
+});
+
+// ✅ Contact Form Route (Saves to MongoDB)
+app.post("/api/contact", async (req, res) => {
+  try {
+    const { name, email, message } = req.body;
+    if (!name || !email || !message) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+    const newMessage = new ContactMessage({ name, email, message });
+    await newMessage.save();
+    res.json({ message: "Message saved successfully!" });
+  } catch (error) {
+    console.error("❌ Contact Form Error:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// ✅ Start Server
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 
 

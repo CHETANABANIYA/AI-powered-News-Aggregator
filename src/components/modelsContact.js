@@ -1,4 +1,3 @@
-// models/Contact.js
 const mongoose = require("mongoose");
 
 const ContactSchema = new mongoose.Schema({
@@ -8,3 +7,4 @@ const ContactSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 module.exports = mongoose.model("Contact", ContactSchema);
+
