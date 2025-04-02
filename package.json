@@ -14,9 +14,8 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
-  
-  "jsonwebtoken": "^9.0.2"
-  "@mailchimp/mailchimp_marketing": "^3.0.80",
+  "jsonwebtoken": "^9.0.2",
+    "@mailchimp/mailchimp_marketing": "^3.0.80",
     "axios": "^1.8.3",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
