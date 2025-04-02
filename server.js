@@ -292,7 +292,6 @@ app.post("/api/signup", async (req, res) => {
 });
 
 // ✅ Google OAuth Strategy (Fix: Use Full Callback URL)
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -315,7 +314,6 @@ passport.use(new GoogleStrategy({
 }));
 
 // ✅ Facebook OAuth Strategy (Fix: Use Full Callback URL)
-const FacebookStrategy = require('passport-facebook').Strategy;
 passport.use(new FacebookStrategy({
     clientID: process.env.FACEBOOK_CLIENT_ID,
     clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
