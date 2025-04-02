@@ -95,23 +95,36 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// ✅ Session & Passport Setup
+// ✅ Session Middleware (Ensures session & cookies work)
 app.use(
-  session({
-    store: new RedisStore({ client: redisClient }),
-    secret: SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === "production", // Secure only in production
-      httpOnly: true, // Prevents client-side access
-      sameSite: "Lax" // Ensures compatibility
-    }
-  })
+    session({
+        store: new RedisStore({ client: redisClient }),
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            secure: process.env.NODE_ENV === "production", // Secure only in production
+            httpOnly: true, // Prevents client-side access
+            sameSite: "Lax", // Ensures compatibility
+        },
+    })
 );
 
+// ✅ Debugging: Log session & user
+app.use((req, res, next) => {
+    console.log("🔍 Session:", req.session);
+    console.log("👤 User:", req.user);
+    next();
+});
+
+// ✅ Initialize Passport
 app.use(passport.initialize());
 app.use(passport.session());
+
+// ✅ Test Session Route
+app.get("/test-session", (req, res) => {
+    res.json({ session: req.session, user: req.user });
+});
 
 // ✅ Middleware Setup
 app.use(cors());
