@@ -3,18 +3,16 @@ import express from "express";
 import mongoose from "mongoose";
 import axios from "axios";
 import cors from "cors";
-import rateLimit from "express-rate-limit";
-import mailchimp from "@mailchimp/mailchimp_marketing";
-import passport from "passport";
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import { Strategy as FacebookStrategy } from "passport-facebook";
 import session from "express-session";
 import RedisStore from "connect-redis";
 import { createClient } from "redis";
+import passport from "passport";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { Strategy as FacebookStrategy } from "passport-facebook";
+import mailchimp from "@mailchimp/mailchimp_marketing";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import cookieParser from "cookie-parser"; // ✅ FIXED
-
+import cookieParser from "cookie-parser";
 import User from "./models/User.js";
 import Contact from "./models/Contact.js";
 
@@ -47,11 +45,14 @@ mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
-// ✅ Redis Client Setup (Fixed Duplicate)
-const redisClient = createClient({ url: REDIS_URL });
-redisClient.on("error", (err) => console.error(`❌ Redis Error: ${err.message}`));
-await redisClient.connect();
-console.log("✅ Connected to Redis");
+// ✅ Redis Client Setup (Fixed `await` issue)
+let redisClient;
+(async () => {
+  redisClient = createClient({ url: REDIS_URL });
+  redisClient.on("error", (err) => console.error(`❌ Redis Error: ${err.message}`));
+  await redisClient.connect();
+  console.log("✅ Connected to Redis");
+})();
 
 // ✅ Mailchimp Configuration
 mailchimp.setConfig({ apiKey: MAILCHIMP_API_KEY, server: "us11" });
@@ -64,9 +65,9 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
-app.use(cookieParser()); // ✅ FIXED
+app.use(cookieParser());
 
-// ✅ Session Middleware (Removed Duplicate)
+// ✅ Session Middleware
 app.use(session({
   store: new RedisStore({ client: redisClient }),
   secret: SESSION_SECRET,
@@ -79,7 +80,49 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ✅ Google OAuth Strategy (Fixed Callback URL)
+// ✅ Security Headers
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://ai-powered-news-aggregator.vercel.app");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
+  next();
+});
+
+// ✅ News Route (Fixed CORS and 500 Error)
+app.get("/api/news", async (req, res) => {
+  try {
+    const { category = "general", country = "us", language = "en" } = req.query;
+    const redisKey = `news:${country}:${category}:${language}`;
+    
+    // ✅ Check Redis Cache
+    const cachedData = await redisClient.get(redisKey);
+    if (cachedData) return res.json(JSON.parse(cachedData));
+
+    // ✅ Fetch News from API
+    const response = await axios.get(`https://newsapi.org/v2/top-headlines`, {
+      params: { country, category, language, apiKey: NEWSAPI_KEY },
+    });
+
+    if (response.status !== 200) {
+      throw new Error(`❌ News API Error: ${response.status} ${response.statusText}`);
+    }
+
+    // ✅ Store in Redis & Send Response
+    await redisClient.setEx(redisKey, 1800, JSON.stringify(response.data));
+    res.json(response.data);
+  } catch (error) {
+    console.error("❌ Error Fetching News:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// ✅ Google OAuth Strategy
 passport.use(new GoogleStrategy({
   clientID: GOOGLE_CLIENT_ID,
   clientSecret: GOOGLE_CLIENT_SECRET,
@@ -97,7 +140,7 @@ passport.use(new GoogleStrategy({
   }
 }));
 
-// ✅ Facebook OAuth Strategy (Fixed Callback URL)
+// ✅ Facebook OAuth Strategy
 passport.use(new FacebookStrategy({
   clientID: FACEBOOK_CLIENT_ID,
   clientSecret: FACEBOOK_CLIENT_SECRET,
@@ -137,19 +180,6 @@ app.get("/api/auth/facebook/callback", passport.authenticate("facebook", { failu
   res.redirect("https://ai-powered-news-aggregator.vercel.app");
 });
 
-// ✅ News Route
-app.get("/api/news", async (req, res) => {
-  const { category = "general", country = "us", language = "en" } = req.query;
-  const redisKey = `news:${country}:${category}:${language}`;
-  const cachedData = await redisClient.get(redisKey);
-
-  if (cachedData) return res.json(JSON.parse(cachedData));
-
-  const response = await axios.get(`https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&language=${language}&apiKey=${NEWSAPI_KEY}`);
-  await redisClient.setEx(redisKey, 1800, JSON.stringify(response.data));
-  res.json(response.data);
-});
-
 // ✅ Mailchimp Subscription Route
 app.post("/api/subscribe", async (req, res) => {
   try {
@@ -158,19 +188,6 @@ app.post("/api/subscribe", async (req, res) => {
 
     await mailchimp.lists.addListMember(MAILCHIMP_LIST_ID, { email_address: email, status: "subscribed" });
     res.json({ message: "Successfully subscribed!" });
-  } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-// ✅ Contact Form Route
-app.post("/api/contact", async (req, res) => {
-  try {
-    const { name, email, message } = req.body;
-    if (!name || !email || !message) return res.status(400).json({ error: "All fields are required" });
-
-    await Contact.create({ name, email, message });
-    res.json({ message: "Message saved successfully!" });
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
