@@ -368,8 +368,10 @@ passport.deserializeUser(async (id, done) => {
 });
 
 // ✅ Google Auth Routes
-app.get("/api/auth/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
+app.get('/api/auth/google', 
+  passport.authenticate('google', { 
+    scope: ['profile', 'email']  // ✅ REQUIRED SCOPES
+  })
 );
 
 app.get("/api/auth/google/callback",

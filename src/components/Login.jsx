@@ -65,8 +65,8 @@ export default function Login() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "https://ai-powered-news-aggregator-backend.onrender.com/api/auth/google";
-  };
+  window.location.href = "https://ai-powered-news-aggregator-backend.onrender.com/api/auth/google";
+};
 
   return (
     <div className="login-container">

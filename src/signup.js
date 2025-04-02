@@ -76,9 +76,9 @@ export default function Signup() {
     }
   };
 
-  const handleGoogleSignup = () => {
-    window.location.href = "https://ai-powered-news-aggregator-backend.onrender.com/api/auth/google";
-  };
+ const handleGoogleSignup = () => {
+  window.location.href = "https://ai-powered-news-aggregator-backend.onrender.com/api/auth/google";
+};
 
   const handleFacebookSignup = () => {
     if (window.FB) {
