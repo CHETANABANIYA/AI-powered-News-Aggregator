@@ -350,12 +350,13 @@ passport.deserializeUser(async (id, done) => {
 });
 
 // ✅ Google Auth Routes
-app.get("/api/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
-app.get("/api/auth/google/callback", passport.authenticate("google", {
-  failureRedirect: "/login",
-}), (req, res) => {
-  res.redirect("https://ai-powered-news-aggregator.vercel.app");
-});
+app.get("/api/auth/google/callback",
+  passport.authenticate("google", { failureRedirect: "/login" }),
+  (req, res) => {
+    res.redirect("https://ai-powered-news-aggregator.vercel.app");
+  }
+);
+
 
 // ✅ Facebook Auth Routes (Fix: Remove duplicate)
 app.get("/api/auth/facebook", passport.authenticate("facebook", { scope: ["email"] }));
