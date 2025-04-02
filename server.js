@@ -347,6 +347,10 @@ passport.deserializeUser(async (id, done) => {
 });
 
 // ✅ Google Auth Routes
+app.get("/api/auth/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
 app.get("/api/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/login" }),
   (req, res) => {
