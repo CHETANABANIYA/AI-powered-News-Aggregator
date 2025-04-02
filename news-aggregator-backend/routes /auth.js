@@ -1,10 +1,8 @@
-// auth.js
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const passport = require("passport");
 const User = require("../models/User");
-const Contact = require("../models/Contact"); // ✅ Import Contact model
 
 // 🟢 User Signup
 router.post("/signup", async (req, res) => {
@@ -48,6 +46,7 @@ router.get("/logout", (req, res) => {
 });
 
 module.exports = router;
+
 
 
 

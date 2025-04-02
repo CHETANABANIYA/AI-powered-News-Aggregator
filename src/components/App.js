@@ -15,24 +15,15 @@ const isAuthenticated = () => !!localStorage.getItem("token");
 
 function App() {
   return (
-    <Router>
+    <Router> {/* ✅ Single Router at the root level */}
       <Routes>
-        {/* Welcome Page */}
         <Route path="/" element={<Welcome />} />
-
-        {/* Signup and Login Pages */}
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-
-        {/* Protected Home Page (Only if Logged In) */}
         <Route
           path="/index"
           element={
-            isAuthenticated() ? (
-              <MainHomePage />
-            ) : (
-              <Navigate to="/login" replace />
-            )
+            isAuthenticated() ? <MainHomePage /> : <Navigate to="/login" replace />
           }
         />
       </Routes>
@@ -53,6 +44,7 @@ const MainHomePage = () => (
 );
 
 export default App;
+
 
 
 
