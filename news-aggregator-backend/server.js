@@ -282,9 +282,12 @@ app.post("/api/login", async (req, res) => {
 });
 
 // ✅ Manual Signup Route
+// ✅ Signup Route Debugging
 app.post("/api/signup", async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    console.log("Signup Attempt:", req.body);  // ✅ Debugging Output
+
     if (!name || !email || !password) {
       return res.status(400).json({ error: "All fields are required" });
     }
@@ -297,6 +300,7 @@ app.post("/api/signup", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({ name, email, password: hashedPassword });
     await newUser.save();
+    console.log("✅ New User Saved:", newUser); // ✅ Debugging Output
 
     res.json({ message: "Signup successful! Please login." });
   } catch (error) {
@@ -304,6 +308,7 @@ app.post("/api/signup", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 
 // ✅ Google OAuth Strategy (Fix: Use Full Callback URL)
 

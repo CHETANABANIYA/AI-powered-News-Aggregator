@@ -23,30 +23,30 @@ passport.deserializeUser(async (id, done) => {
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "https://ai-powered-news-aggregator-backend.onrender.com/api/auth/google/callback",
-    scope: ["profile", "email"] // Ensure "email" is included
+    callbackURL: "https://ai-powered-news-aggregator-backend.onrender.com/api/auth/google/callback"
 }, async (accessToken, refreshToken, profile, done) => {
+    console.log("Google Profile Data:", profile);  // ✅ Debugging Output
+
     try {
-        const email = profile.emails?.[0]?.value; // Get email safely
-
-        if (!email) return done(new Error("No email returned from Google"), null);
-
-        let user = await User.findOne({ email });
+        let user = await User.findOne({ email: profile.emails[0].value });
 
         if (!user) {
             user = new User({
                 name: profile.displayName,
-                email,
-                password: "", // OAuth users don't have passwords
-                photo: profile.photos?.[0]?.value || null
+                email: profile.emails[0].value,
+                password: "", // No password for OAuth users
+                photo: profile.photos ? profile.photos[0].value : null
             });
             await user.save();
+            console.log("✅ New Google User Saved:", user);
         }
         return done(null, user);
     } catch (error) {
+        console.error("❌ Google OAuth Error:", error.message);
         return done(error, null);
     }
 }));
+
 
 
 // ✅ Facebook OAuth Strategy (Enhanced for missing emails)
