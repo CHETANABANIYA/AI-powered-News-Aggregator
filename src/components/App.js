@@ -1,5 +1,5 @@
-import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Welcome from "./components/Welcome";
 import Signup from "./components/Signup";
 import Login from "./components/Login";
@@ -11,23 +11,22 @@ import SubscriptionSection from "./components/SubscriptionSection";
 import Footer from "./components/Footer";
 
 // Function to check if the user is authenticated
-const isAuthenticated = () => !!localStorage.getItem("token");
+const isAuthenticated = () => Boolean(localStorage?.getItem("token"));
 
-function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<Welcome />} />
-      <Route path="/signup" element={<Signup />} />
-      <Route path="/login" element={<Login />} />
-      <Route
-        path="/index"
-        element={isAuthenticated() ? <MainHomePage /> : <Navigate to="/login" replace />}
-      />
-    </Routes>
-  );
-}
+// Welcome Page with Auto-Redirect After Few Seconds
+const WelcomePage = () => {
+  const navigate = useNavigate();
 
-// Main Home Page as a Separate Component
+  useEffect(() => {
+    setTimeout(() => {
+      navigate("/index");
+    }, 3000); // Redirect after 3 seconds
+  }, [navigate]);
+
+  return <Welcome />;
+};
+
+// Main Home Page Component
 const MainHomePage = () => (
   <>
     <Navbar />
@@ -39,14 +38,19 @@ const MainHomePage = () => (
   </>
 );
 
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<WelcomePage />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/login" element={<Login />} />
+      <Route
+        path="/index"
+        element={isAuthenticated() ? <MainHomePage /> : <Navigate to="/login" replace />}
+      />
+    </Routes>
+  );
+}
+
 export default App;
-
-
-
-
-
-
-
-
-
 
