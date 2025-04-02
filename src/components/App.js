@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Welcome from "./components/Welcome";
 import Signup from "./components/Signup";
 import Login from "./components/Login";
@@ -13,35 +13,34 @@ import Footer from "./components/Footer";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        {/* Welcome Page (First Page Users See) */}
-        <Route path="/" element={<Welcome />} />
+    <Routes>
+      {/* Welcome Page (First Page Users See) */}
+      <Route path="/" element={<Welcome />} />
 
-        {/* Signup and Login Pages (No Navbar on These Pages) */}
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
+      {/* Signup and Login Pages */}
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/login" element={<Login />} />
 
-        {/* Main Home Page (After Login) */}
-        <Route
-          path="/index"
-          element={
-            <>
-              <Navbar />
-              <HeroSection />
-              <Carousel />
-              <NewsCategories />
-              <SubscriptionSection />
-              <Footer />
-            </>
-          }
-        />
-      </Routes>
-    </Router>
+      {/* Main Home Page (After Login) */}
+      <Route
+        path="/index"
+        element={
+          <>
+            <Navbar />
+            <HeroSection />
+            <Carousel />
+            <NewsCategories />
+            <SubscriptionSection />
+            <Footer />
+          </>
+        }
+      />
+    </Routes>
   );
 }
 
 export default App;
+
 
 
 
