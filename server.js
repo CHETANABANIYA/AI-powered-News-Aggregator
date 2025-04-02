@@ -14,6 +14,9 @@ import { createClient } from "redis";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+import User from "./models/User.js";  // ✅ Corrected import
+import Contact from "./models/Contact.js";  // ✅ Corrected import
+
 // Load environment variables
 dotenv.config();
 const app = express();
@@ -100,8 +103,9 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === "production",
-      httpOnly: true
+      secure: process.env.NODE_ENV === "production", // Secure only in production
+      httpOnly: true, // Prevents client-side access
+      sameSite: "Lax" // Ensures compatibility
     }
   })
 );
@@ -245,7 +249,7 @@ app.post("/api/contact", async (req, res) => {
   }
 });
 
-// ✅ login Route (Manual Signup)
+// ✅ Manual Login Route (Fix)
 app.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -263,7 +267,7 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-// ✅ Signup Route (Manual Signup)
+// ✅ Manual Signup Route
 app.post("/api/signup", async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -287,63 +291,62 @@ app.post("/api/signup", async (req, res) => {
   }
 });
 
-// ✅ Google OAuth Strategy
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "/api/auth/google/callback",
-    },
-    async (accessToken, refreshToken, profile, done) => {
-      try {
-        let user = await User.findOne({ email: profile.emails[0].value });
-        if (!user) {
-          user = new User({ 
-            name: profile.displayName, 
-            email: profile.emails[0].value,
-            password: "", // No password for OAuth users
-          });
-          await user.save();
-        }
-        return done(null, user);
-      } catch (error) {
-        return done(error, null);
+// ✅ Google OAuth Strategy (Fix: Use Full Callback URL)
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "https://ai-powered-news-aggregator-backend.onrender.com/api/auth/google/callback",
+  }, async (accessToken, refreshToken, profile, done) => {
+    try {
+      let user = await User.findOne({ email: profile.emails[0].value });
+      if (!user) {
+        user = new User({ 
+          name: profile.displayName, 
+          email: profile.emails[0].value,
+          password: "",
+        });
+        await user.save();
       }
+      return done(null, user);
+    } catch (error) {
+      return done(error, null);
     }
-  )
-);
+}));
 
-// ✅ Facebook OAuth Strategy
-passport.use(
-  new FacebookStrategy(
-    {
-      clientID: process.env.FACEBOOK_CLIENT_ID,
-      clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-      callbackURL: "/api/auth/facebook/callback",
-      profileFields: ["id", "displayName", "emails"],
-    },
-    async (accessToken, refreshToken, profile, done) => {
-      try {
-        let user = await User.findOne({ email: profile.emails[0].value });
-        if (!user) {
-          user = new User({ 
-            name: profile.displayName, 
-            email: profile.emails[0].value,
-            password: "",
-          });
-          await user.save();
-        }
-        return done(null, user);
-      } catch (error) {
-        return done(error, null);
+// ✅ Facebook OAuth Strategy (Fix: Use Full Callback URL)
+const FacebookStrategy = require('passport-facebook').Strategy;
+passport.use(new FacebookStrategy({
+    clientID: process.env.FACEBOOK_CLIENT_ID,
+    clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+    callbackURL: "https://ai-powered-news-aggregator-backend.onrender.com/api/auth/facebook/callback",
+    profileFields: ["id", "displayName", "emails"],
+  }, async (accessToken, refreshToken, profile, done) => {
+    try {
+      let user = await User.findOne({ email: profile.emails[0].value });
+      if (!user) {
+        user = new User({ 
+          name: profile.displayName, 
+          email: profile.emails[0].value,
+          password: "",
+        });
+        await user.save();
       }
+      return done(null, user);
+    } catch (error) {
+      return done(error, null);
     }
-  )
-);
+}));
 
-passport.serializeUser((user, done) => done(null, user));
-passport.deserializeUser((obj, done) => done(null, obj));
+passport.serializeUser((user, done) => done(null, user.id));
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (err) {
+    done(err, null);
+  }
+});
 
 // ✅ Google Auth Routes
 app.get("/api/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
@@ -353,28 +356,13 @@ app.get("/api/auth/google/callback", passport.authenticate("google", {
   res.redirect("https://ai-powered-news-aggregator.vercel.app");
 });
 
-// ✅ Facebook Auth Routes
+// ✅ Facebook Auth Routes (Fix: Remove duplicate)
 app.get("/api/auth/facebook", passport.authenticate("facebook", { scope: ["email"] }));
 app.get("/api/auth/facebook/callback", passport.authenticate("facebook", {
   failureRedirect: "/login",
 }), (req, res) => {
   res.redirect("https://ai-powered-news-aggregator.vercel.app");
 });
-
-// ✅ Define User Model
-const userSchema = new mongoose.Schema({
-  name: String,
-  email: { type: String, unique: true },
-  password: String,
-  createdAt: { type: Date, default: Date.now },
-});
-const User = mongoose.model("User", userSchema);
-
-app.get('/api/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }));
-app.get('/api/auth/facebook/callback', passport.authenticate('facebook', {
-  successRedirect: '/dashboard',
-  failureRedirect: '/login'
-}));
 
 // ✅ Start Server
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
