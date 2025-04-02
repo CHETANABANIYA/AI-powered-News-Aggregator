@@ -17,26 +17,19 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Welcome Page (First Page Users See) */}
+        {/* Welcome Page */}
         <Route path="/" element={<Welcome />} />
 
         {/* Signup and Login Pages */}
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
 
-        {/* Main Home Page (After Login) */}
+        {/* Protected Home Page (Only if Logged In) */}
         <Route
           path="/index"
           element={
             isAuthenticated() ? (
-              <>
-                <Navbar />
-                <HeroSection />
-                <Carousel />
-                <NewsCategories />
-                <SubscriptionSection />
-                <Footer />
-              </>
+              <MainHomePage />
             ) : (
               <Navigate to="/login" replace />
             )
@@ -47,7 +40,20 @@ function App() {
   );
 }
 
+// Main Home Page as a Separate Component
+const MainHomePage = () => (
+  <>
+    <Navbar />
+    <HeroSection />
+    <Carousel />
+    <NewsCategories />
+    <SubscriptionSection />
+    <Footer />
+  </>
+);
+
 export default App;
+
 
 
 

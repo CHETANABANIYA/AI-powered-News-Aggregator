@@ -9,33 +9,35 @@ export default function Signup() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Load Facebook SDK
-    window.fbAsyncInit = function () {
-      window.FB.init({
-        appId: "1182578409398725",
-        cookie: true,
-        xfbml: true,
-        version: "v18.0",
-      });
-    };
+    // ✅ Load Facebook SDK only once
+    if (!window.FB) {
+      window.fbAsyncInit = function () {
+        window.FB.init({
+          appId: "1182578409398725",
+          cookie: true,
+          xfbml: true,
+          version: "v18.0",
+        });
+      };
 
-    (function (d, s, id) {
-      let js, fjs = d.getElementsByTagName(s)[0];
-      if (d.getElementById(id)) return;
-      js = d.createElement(s);
-      js.id = id;
-      js.src = "https://connect.facebook.net/en_US/sdk.js";
-      fjs.parentNode.insertBefore(js, fjs);
-    })(document, "script", "facebook-jssdk");
+      (function (d, s, id) {
+        let js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "https://connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+      })(document, "script", "facebook-jssdk");
+    }
 
-    // ✅ Fetch authenticated user on mount
+    // ✅ Check if user is already authenticated
     fetch("https://ai-powered-news-aggregator-backend.onrender.com/api/auth/user", {
       credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => {
         if (data.user) {
-          navigate("/"); // Redirect if already logged in
+          navigate("/index"); // Redirect if already logged in
         }
       })
       .catch(() => {});
@@ -53,7 +55,7 @@ export default function Signup() {
     const password = e.target.password.value;
 
     try {
-      const response = await fetch("https://ai-powered-news-aggregator-backend.onrender.com/api/signup", {
+      const response = await fetch("https://ai-powered-news-aggregator-backend.onrender.com/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
@@ -63,7 +65,8 @@ export default function Signup() {
       setLoading(false);
       if (response.ok) {
         alert("✅ Account created successfully!");
-        navigate("/login");
+        localStorage.setItem("token", data.token); // Store token
+        navigate("/index"); // Redirect to home
       } else {
         setError(data.message || "Signup failed. Please try again.");
       }
@@ -78,16 +81,20 @@ export default function Signup() {
   };
 
   const handleFacebookSignup = () => {
-    window.FB.login(
-      (response) => {
-        if (response.authResponse) {
-          window.location.href = `https://ai-powered-news-aggregator-backend.onrender.com/api/auth/facebook?access_token=${response.authResponse.accessToken}`;
-        } else {
-          setError("Facebook signup failed. Please try again.");
-        }
-      },
-      { scope: "email,public_profile" }
-    );
+    if (window.FB) {
+      window.FB.login(
+        (response) => {
+          if (response.authResponse) {
+            window.location.href = `https://ai-powered-news-aggregator-backend.onrender.com/api/auth/facebook?access_token=${response.authResponse.accessToken}`;
+          } else {
+            setError("Facebook signup failed. Please try again.");
+          }
+        },
+        { scope: "email,public_profile" }
+      );
+    } else {
+      setError("Facebook SDK not loaded. Try again.");
+    }
   };
 
   return (
@@ -110,6 +117,8 @@ export default function Signup() {
     </div>
   );
 }
+
+
 
 
 
