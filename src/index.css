@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Global Styles */
 body {
   font-family: 'Roboto', sans-serif;
@@ -119,6 +123,4 @@ body {
 .footer a:hover {
   text-decoration: underline;
 }
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
