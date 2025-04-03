@@ -7,7 +7,7 @@ import Carousel from "./components/Carousel";
 import NewsCategories from "./components/NewsCategories";
 import SubscriptionSection from "./components/SubscriptionSection";
 import Footer from "./components/Footer";
-
+import "./index.css";
 // Welcome Page with Auto-Redirect After 3 Seconds
 const WelcomePage = () => {
   const navigate = useNavigate();
