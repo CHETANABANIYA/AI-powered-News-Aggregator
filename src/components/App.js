@@ -7,21 +7,23 @@ import Carousel from "./components/Carousel";
 import NewsCategories from "./components/NewsCategories";
 import SubscriptionSection from "./components/SubscriptionSection";
 import Footer from "./components/Footer";
+import NewsAggregator from "./components/NewsAggregator"; // Import the new layout
 import "./index.css";
-// Welcome Page with Auto-Redirect After 3 Seconds
+
+// Welcome Page with Auto-Redirect
 const WelcomePage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
     setTimeout(() => {
       navigate("/index");
-    }, 3000); // Redirects after 3 seconds
+    }, 3000);
   }, [navigate]);
 
   return <Welcome />;
 };
 
-// Main Home Page Component
+// Main Home Page Component (Updated)
 const MainHomePage = () => (
   <>
     <Navbar />
@@ -30,6 +32,7 @@ const MainHomePage = () => (
     <NewsCategories />
     <SubscriptionSection />
     <Footer />
+    <NewsAggregator />  {/* Add the new component */}
   </>
 );
 

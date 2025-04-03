@@ -119,4 +119,6 @@ body {
 .footer a:hover {
   text-decoration: underline;
 }
-
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
