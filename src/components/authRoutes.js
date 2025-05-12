@@ -26,15 +26,22 @@ router.post("/signup", async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 12);
         const newUser = await User.create({ name, email, password: hashedPassword });
 
-        res.status(201).json({ 
-            message: "User created successfully", 
-            user: { id: newUser._id, name: newUser.name, email: newUser.email } 
+        // ✅ Generate JWT token
+        const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
+            expiresIn: "7d",
+        });
+
+        res.status(201).json({
+            message: "User created successfully",
+            token, // ✅ Include token in response
+            user: { id: newUser._id, name: newUser.name, email: newUser.email },
         });
     } catch (error) {
         console.error("❌ Signup Error:", error.message);
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
 
 // User Login
 router.post("/login", async (req, res) => {
